@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相册详情 - Love Story</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        :root {
+            --primary: #f43f5e;
+            --secondary: #8b5cf6;
+            --light: #f9fafb;
+            --dark: #111827;
+        }
+        .bg-primary {
+            background-color: var(--primary);
+        }
+        .text-primary {
+            color: var(--primary);
+        }
+        .bg-secondary {
+            background-color: var(--secondary);
+        }
+        .text-secondary {
+            color: var(--secondary);
+        }
+        .bg-light {
+            background-color: var(--light);
+        }
+        .text-dark {
+            color: var(--dark);
+        }
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .photo-item:hover img {
+            transform: scale(1.05);
+        }
+        .photo-item img {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-light min-h-screen">
+    <!-- 导航栏 -->
+    <header id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="index.html" class="flex items-center space-x-2">
+                <i class="fa fa-heart text-primary text-2xl"></i>
+                <span class="text-xl font-bold text-primary">Love Story</span>
+            </a>
+            
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="index.html#home" class="font-medium hover:text-primary transition-colors">首页</a>
+                <a href="index.html#timeline" class="font-medium hover:text-primary transition-colors">时间轴</a>
+                <a href="index.html#album" class="font-medium hover:text-primary transition-colors">相册</a>
+                <a href="index.html#photos" class="font-medium hover:text-primary transition-colors">照片墙</a>
+                <a href="index.html#journal" class="font-medium hover:text-primary transition-colors">日记本</a>
+                <a href="admin-login.html" class="bg-primary/10 text-primary px-4 py-2 rounded-full hover:bg-primary/20 transition-colors inline-flex items-center">
+                    <i class="fa fa-lock mr-1"></i> 管理员登录
+                </a>
+            </nav>
+            
+            <button id="menu-toggle" class="md:hidden text-dark text-xl">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg absolute w-full">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+                <a href="index.html#home" class="font-medium py-2 hover:text-primary transition-colors">首页</a>
+                <a href="index.html#timeline" class="font-medium py-2 hover:text-primary transition-colors">时间轴</a>
+                <a href="index.html#album" class="font-medium py-2 hover:text-primary transition-colors">相册</a>
+                <a href="index.html#photos" class="font-medium py-2 hover:text-primary transition-colors">照片墙</a>
+                <a href="index.html#journal" class="font-medium py-2 hover:text-primary transition-colors">日记本</a>
+                <a href="admin-login.html" class="w-full bg-primary/10 text-primary px-4 py-2 rounded-full hover:bg-primary/20 transition-colors mt-2 flex items-center justify-center">
+                    <i class="fa fa-lock mr-1"></i> 管理员登录
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 相册详情 -->
+    <section class="pt-24 pb-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-primary mb-2" id="album-title">相册详情</h2>
+                    <p class="text-gray-600" id="album-description">查看相册中的所有照片</p>
+                </div>
+                <div class="flex space-x-3" id="admin-actions" class="hidden">
+                    <button id="add-photo-btn" class="bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary/90 transition-colors">
+                        <i class="fa fa-plus mr-1"></i> 添加照片
+                    </button>
+                    <button id="edit-album-btn" class="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-colors">
+                        <i class="fa fa-edit mr-1"></i> 编辑相册
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="photos-container">
+                <!-- 照片将通过JavaScript动态加载 -->
+                <div class="text-center col-span-full py-12 text-gray-500">
+                    <i class="fa fa-spinner fa-spin text-3xl mb-4"></i>
+                    <p>加载照片中...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 照片查看模态框 -->
+    <div id="photo-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
+        <button id="close-modal" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300">
+            <i class="fa fa-times"></i>
+        </button>
+        <div class="relative max-w-4xl w-full">
+            <img id="modal-photo" src="" alt="大图预览" class="max-h-[80vh] mx-auto">
+            <div class="absolute bottom-4 left-0 right-0 text-center text-white">
+                <h4 id="modal-title" class="text-xl font-bold"></h4>
+                <p id="modal-date" class="text-sm opacity-80"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回顶部按钮 -->
+    <button id="back-to-top" class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg opacity-0 invisible transition-all z-40">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // 导航栏滚动效果
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                navbar.classList.add('py-2', 'shadow-md');
+                navbar.classList.remove('py-3', 'shadow-sm');
+            } else {
+                navbar.classList.add('py-3', 'shadow-sm');
+                navbar.classList.remove('py-2', 'shadow-md');
+            }
+        });
+
+        // 移动端菜单
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            if (mobileMenu.classList.contains('hidden')) {
+                menuToggle.innerHTML = '<i class="fa fa-bars"></i>';
+            } else {
+                menuToggle.innerHTML = '<i class="fa fa-times"></i>';
+            }
+        });
+
+        // 返回顶部按钮
+        const backToTopBtn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove('opacity-0', 'invisible');
+                backToTopBtn.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopBtn.classList.add('opacity-0', 'invisible');
+                backToTopBtn.classList.remove('opacity-100', 'visible');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // 配置后端API地址
+        const API_URL = 'https://your-worker-url.workers.dev';
+
+        // 获取URL中的相册ID
+        function getAlbumId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id') || '1'; // 默认相册ID为1
+        }
+
+        // 加载相册详情
+        async function loadAlbumDetail() {
+            const albumId = getAlbumId();
+            try {
+                const response = await fetch(`${API_URL}/api/albums/${albumId}`);
+                const album = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('album-title').textContent = album.title;
+                    document.getElementById('album-description').textContent = album.description;
+                    loadAlbumPhotos(albumId);
+                    checkAdminStatus();
+                } else {
+                    document.getElementById('photos-container').innerHTML = `
+                        <div class="text-center col-span-full py-12 text-gray-500">
+                            <i class="fa fa-exclamation-circle text-3xl mb-4"></i>
+                            <p>加载相册失败: ${album.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('photos-container').innerHTML = `
+                    <div class="text-center col-span-full py-12 text-gray-500">
+                        <i class="fa fa-exclamation-circle text-3xl mb-4"></i>
+                        <p>加载相册失败，请稍后重试</p>
+                    </div>
+                `;
+                console.error('Load album detail error:', error);
+            }
+        }
+
+        // 加载相册照片
+        async function loadAlbumPhotos(albumId) {
+            try {
+                const response = await fetch(`${API_URL}/api/albums/${albumId}/photos`);
+                const photos = await response.json();
+
+                if (response.ok && photos.length > 0) {
+                    const container = document.getElementById('photos-container');
+                    container.innerHTML = '';
+
+                    photos.forEach((photo, index) => {
+                        const photoItem = document.createElement('div');
+                        photoItem.className = 'photo-item rounded-xl overflow-hidden shadow-md group';
+                        photoItem.innerHTML = `
+                            <div class="relative aspect-square overflow-hidden">
+                                <img src="${photo.url || `https://picsum.photos/seed/album${albumId}photo${index}/400/400`}" alt="${photo.title || `照片 ${index + 1}`}" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                    <div class="text-white text-center p-2">
+                                        <h4 class="font-bold text-sm">${photo.title || `照片 ${index + 1}`}</h4>
+                                        <p class="text-xs opacity-80">${photo.date || '未知日期'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        photoItem.addEventListener('click', () => openPhotoModal(photo));
+                        container.appendChild(photoItem);
+                    });
+                } else {
+                    document.getElementById('photos-container').innerHTML = `
+                        <div class="text-center col-span-full py-12 text-gray-500">
+                            <i class="fa fa-picture-o text-3xl mb-4"></i>
+                            <p>该相册中没有照片</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('photos-container').innerHTML = `
+                    <div class="text-center col-span-full py-12 text-gray-500">
+                        <i class="fa fa-exclamation-circle text-3xl mb-4"></i>
+                        <p>加载照片失败，请稍后重试</p>
+                    </div>
+                `;
+                console.error('Load album photos error:', error);
+            }
+        }
+
+        // 打开照片查看模态框
+        function openPhotoModal(photo) {
+            document.getElementById('modal-photo').src = photo.url || 'https://picsum.photos/seed/default/800/600';
+            document.getElementById('modal-title').textContent = photo.title || '照片';
+            document.getElementById('modal-date').textContent = photo.date || '未知日期';
+            document.getElementById('photo-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭照片查看模态框
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('photo-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        });
+
+        // 点击模态框外部关闭
+        document.getElementById('photo-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('photo-modal')) {
+                document.getElementById('photo-modal').classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // 检查管理员状态
+        function checkAdminStatus() {
+            const authToken = localStorage.getItem('authToken');
+            if (authToken) {
+                document.getElementById('admin-actions').classList.remove('hidden');
+            }
+        }
+
+        // 添加照片按钮事件
+        document.getElementById('add-photo-btn').addEventListener('click', async function() {
+            const albumId = getAlbumId();
+            const url = prompt('请输入照片URL:');
+            const title = prompt('请输入照片标题:');
+            const date = prompt('请输入日期 (YYYY-MM-DD):');
+
+            if (url) {
+                try {
+                    const response = await fetch(`${API_URL}/api/albums/${albumId}/photos`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({ url, title, date })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert('照片添加成功！');
+                        loadAlbumPhotos(albumId);
+                    } else {
+                        alert(`添加失败: ${data.message}`);
+                    }
+                } catch (error) {
+                    alert('添加失败，请稍后重试');
+                    console.error('Add photo error:', error);
+                }
+            }
+        });
+
+        // 编辑相册按钮事件
+        document.getElementById('edit-album-btn').addEventListener('click', async function() {
+            const albumId = getAlbumId();
+            const title = prompt('请输入新相册标题:');
+            const description = prompt('请输入新相册描述:');
+            const coverImage = prompt('请输入新封面图片URL:');
+
+            if (title || description || coverImage) {
+                try {
+                    const response = await fetch(`${API_URL}/api/albums/${albumId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({ title, description, coverImage })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert('相册更新成功！');
+                        loadAlbumDetail();
+                    } else {
+                        alert(`更新失败: ${data.message}`);
+                    }
+                } catch (error) {
+                    alert('更新失败，请稍后重试');
+                    console.error('Edit album error:', error);
+                }
+            }
+        });
+
+        // 页面加载时加载相册详情
+        window.addEventListener('load', loadAlbumDetail);
+    </script>
+</body>
+</html>

@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#8B5CF6',
+                        dark: '#1F2937',
+                        light: '#F3F4F6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sidebar-icon {
+                @apply flex items-center p-2 rounded-lg transition-all duration-300 ease-in-out;
+            }
+            .sidebar-icon-active {
+                @apply bg-primary text-white;
+            }
+            .sidebar-icon:hover:not(.sidebar-icon-active) {
+                @apply bg-light;
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-dark">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 侧边栏导航 -->
+        <aside id="sidebar" class="w-64 bg-white shadow-lg z-20 transition-all duration-300 lg:translate-x-0" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+            <div class="flex flex-col h-full">
+                <!-- 侧边栏头部 -->
+                <div class="p-4 border-b flex items-center justify-between">
+                    <h1 class="text-xl font-bold text-primary flex items-center">
+                        <i class="fa fa-cogs mr-2"></i>管理员后台
+                    </h1>
+                    <button id="closeSidebar" class="lg:hidden text-gray-500 hover:text-dark">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- 侧边栏菜单 -->
+                <nav class="flex-1 p-4 overflow-y-auto">
+                    <ul>
+                        <li class="mb-1">
+                            <a href="#dashboard" class="sidebar-icon sidebar-icon-active mb-1">
+                                <i class="fa fa-tachometer w-6"></i>
+                                <span class="ml-2">控制面板</span>
+                            </a>
+                        </li>
+                        <li class="mb-1">
+                            <a href="#timeline" class="sidebar-icon mb-1">
+                                <i class="fa fa-history w-6"></i>
+                                <span class="ml-2">时间轴管理</span>
+                            </a>
+                        </li>
+                        <li class="mb-1">
+                            <a href="#albums" class="sidebar-icon mb-1">
+                                <i class="fa fa-images w-6"></i>
+                                <span class="ml-2">相册管理</span>
+                            </a>
+                        </li>
+                        <li class="mb-1">
+                            <a href="#settings" class="sidebar-icon mb-1">
+                                <i class="fa fa-user w-6"></i>
+                                <span class="ml-2">账户设置</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- 侧边栏底部 -->
+                <div class="p-4 border-t">
+                    <button id="logoutBtn" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center">
+                        <i class="fa fa-sign-out mr-2"></i>退出登录
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between p-4">
+                    <button id="toggleSidebar" class="lg:hidden text-gray-500 hover:text-dark">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <div class="flex items-center ml-auto">
+                        <div class="relative ml-3">
+                            <div class="flex items-center">
+                                <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/id/64/200/200" alt="Admin Avatar">
+                                <span class="ml-2 hidden md:inline-block text-sm font-medium">管理员</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <main class="flex-1 overflow-y-auto p-6">
+                <!-- 控制面板 -->
+                <section id="dashboard" class="mb-12">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <i class="fa fa-tachometer mr-2"></i>控制面板
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- 统计卡片 -->
+                        <div class="bg-white rounded-xl shadow p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-gray-500 font-medium">时间轴项目</h3>
+                                <div class="bg-blue-100 p-3 rounded-full">
+                                    <i class="fa fa-history text-primary"></i>
+                                </div>
+                            </div>
+                            <p class="text-3xl font-bold" id="timelineCount">3</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-gray-500 font-medium">相册数量</h3>
+                                <div class="bg-green-100 p-3 rounded-full">
+                                    <i class="fa fa-images text-secondary"></i>
+                                </div>
+                            </div>
+                            <p class="text-3xl font-bold" id="albumCount">3</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-gray-500 font-medium">照片总数</h3>
+                                <div class="bg-purple-100 p-3 rounded-full">
+                                    <i class="fa fa-camera text-accent"></i>
+                                </div>
+                            </div>
+                            <p class="text-3xl font-bold" id="photoCount">54</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-gray-500 font-medium">访问次数</h3>
+                                <div class="bg-yellow-100 p-3 rounded-full">
+                                    <i class="fa fa-eye text-yellow-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-3xl font-bold" id="visitCount">128</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 时间轴管理 -->
+                <section id="timeline" class="mb-12 hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold flex items-center">
+                            <i class="fa fa-history mr-2"></i>时间轴管理
+                        </h2>
+                        <button id="addTimelineBtn" class="bg-primary hover:bg-primary/90 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center">
+                            <i class="fa fa-plus mr-2"></i>添加时间轴项目
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">标题</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">描述</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">图片</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="timelineTableBody">
+                                    <!-- 时间轴数据将通过JavaScript动态加载 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 相册管理 -->
+                <section id="albums" class="mb-12 hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold flex items-center">
+                            <i class="fa fa-images mr-2"></i>相册管理
+                        </h2>
+                        <button id="addAlbumBtn" class="bg-secondary hover:bg-secondary/90 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center">
+                            <i class="fa fa-plus mr-2"></i>添加相册
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="albumGrid">
+                        <!-- 相册数据将通过JavaScript动态加载 -->
+                    </div>
+                </section>
+
+                <!-- 账户设置 -->
+                <section id="settings" class="mb-12 hidden">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <i class="fa fa-user mr-2"></i>账户设置
+                    </h2>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <form id="settingsForm" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+                                    <input type="text" id="username" name="username" value="admin" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">电子邮箱</label>
+                                    <input type="email" id="email" name="email" value="admin@example.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-1">当前密码</label>
+                                    <input type="password" id="currentPassword" name="currentPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300">
+                                </div>
+                                <div>
+                                    <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">新密码</label>
+                                    <input type="password" id="newPassword" name="newPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">确认新密码</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300">
+                            </div>
+
+                            <div class="flex justify-end space-x-4 pt-4 border-t">
+                                <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-300">取消</button>
+                                <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors duration-300">保存更改</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- 添加/编辑时间轴项目模态框 -->
+    <div id="timelineModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4">
+            <div class="p-6 border-b flex items-center justify-between">
+                <h3 class="text-xl font-bold" id="timelineModalTitle">添加时间轴项目</h3>
+                <button id="closeTimelineModal" class="text-gray-500 hover:text-dark">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="timelineForm" class="p-6 space-y-4">
+                <input type="hidden" id="timelineId">
+                <div>
+                    <label for="timelineDate" class="block text-sm font-medium text-gray-700 mb-1">日期</label>
+                    <input type="date" id="timelineDate" name="timelineDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300" required>
+                </div>
+                <div>
+                    <label for="timelineTitle" class="block text-sm font-medium text-gray-700 mb-1">标题</label>
+                    <input type="text" id="timelineTitle" name="timelineTitle" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300" required>
+                </div>
+                <div>
+                    <label for="timelineDescription" class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea id="timelineDescription" name="timelineDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300" required></textarea>
+                </div>
+                <div>
+                    <label for="timelineImage" class="block text-sm font-medium text-gray-700 mb-1">图片URL</label>
+                    <input type="url" id="timelineImage" name="timelineImage" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300" placeholder="https://">
+                </div>
+                <div class="flex justify-end space-x-4 pt-4 border-t">
+                    <button type="button" id="cancelTimelineBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-300">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors duration-300">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加/编辑相册模态框 -->
+    <div id="albumModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4">
+            <div class="p-6 border-b flex items-center justify-between">
+                <h3 class="text-xl font-bold" id="albumModalTitle">添加相册</h3>
+                <button id="closeAlbumModal" class="text-gray-500 hover:text-dark">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="albumForm" class="p-6 space-y-4">
+                <input type="hidden" id="albumId">
+                <div>
+                    <label for="albumTitle" class="block text-sm font-medium text-gray-700 mb-1">标题</label>
+                    <input type="text" id="albumTitle" name="albumTitle" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-colors duration-300" required>
+                </div>
+                <div>
+                    <label for="albumDescription" class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea id="albumDescription" name="albumDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-colors duration-300" required></textarea>
+                </div>
+                <div>
+                    <label for="albumCover" class="block text-sm font-medium text-gray-700 mb-1">封面图片URL</label>
+                    <input type="url" id="albumCover" name="albumCover" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-colors duration-300" placeholder="https://" required>
+                </div>
+                <div>
+                    <label for="albumPhotoCount" class="block text-sm font-medium text-gray-700 mb-1">照片数量</label>
+                    <input type="number" id="albumPhotoCount" name="albumPhotoCount" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary transition-colors duration-300" required>
+                </div>
+                <div class="flex justify-end space-x-4 pt-4 border-t">
+                    <button type="button" id="cancelAlbumBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-300">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-white rounded-lg transition-colors duration-300">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 配置
+        const API_URL = 'http://localhost:8787'; // 本地开发环境
+        const HOME_URL = 'index.html';
+        const LOGIN_URL = 'admin-login.html';
+
+        // DOM元素
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebarBtn = document.getElementById('toggleSidebar');
+        const closeSidebarBtn = document.getElementById('closeSidebar');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const sidebarIcons = document.querySelectorAll('.sidebar-icon');
+        const sections = document.querySelectorAll('main > section');
+        const timelineCountEl = document.getElementById('timelineCount');
+        const albumCountEl = document.getElementById('albumCount');
+        const photoCountEl = document.getElementById('photoCount');
+        const visitCountEl = document.getElementById('visitCount');
+        const addTimelineBtn = document.getElementById('addTimelineBtn');
+        const addAlbumBtn = document.getElementById('addAlbumBtn');
+        const timelineModal = document.getElementById('timelineModal');
+        const albumModal = document.getElementById('albumModal');
+        const closeTimelineModalBtn = document.getElementById('closeTimelineModal');
+        const closeAlbumModalBtn = document.getElementById('closeAlbumModal');
+        const cancelTimelineBtn = document.getElementById('cancelTimelineBtn');
+        const cancelAlbumBtn = document.getElementById('cancelAlbumBtn');
+        const timelineForm = document.getElementById('timelineForm');
+        const albumForm = document.getElementById('albumForm');
+        const timelineModalTitle = document.getElementById('timelineModalTitle');
+        const albumModalTitle = document.getElementById('albumModalTitle');
+        const timelineTableBody = document.getElementById('timelineTableBody');
+        const albumGrid = document.getElementById('albumGrid');
+        const settingsForm = document.getElementById('settingsForm');
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 检查登录状态
+            if (!checkAuth()) {
+                window.location.href = LOGIN_URL;
+                return;
+            }
+
+            // 加载数据
+            await loadDashboardData();
+            await loadTimelineData();
+            await loadAlbumData();
+
+            // 事件监听
+            setupEventListeners();
+        });
+
+        // 检查登录状态
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            return token === 'admin_token'; // 本地开发环境模拟验证
+        }
+
+        // 加载仪表盘数据
+        async function loadDashboardData() {
+            try {
+                // 本地开发环境模拟数据
+                if (API_URL.includes('localhost')) {
+                    timelineCountEl.textContent = '3';
+                    albumCountEl.textContent = '3';
+                    photoCountEl.textContent = '54';
+                    visitCountEl.textContent = '128';
+                } else {
+                    // 生产环境获取真实数据
+                    const response = await fetch(`${API_URL}/api/dashboard`);
+                    const data = await response.json();
+                    timelineCountEl.textContent = data.timelineCount || '0';
+                    albumCountEl.textContent = data.albumCount || '0';
+                    photoCountEl.textContent = data.photoCount || '0';
+                    visitCountEl.textContent = data.visitCount || '0';
+                }
+            } catch (error) {
+                console.error('加载仪表盘数据错误:', error);
+                // 显示错误通知
+            }
+        }
+
+        // 加载时间轴数据
+        async function loadTimelineData() {
+            try {
+                // 本地开发环境模拟数据
+                let timelineItems;
+                if (API_URL.includes('localhost')) {
+                    timelineItems = [
+                        { id: 1, date: '2023-10-08', title: '我们的第一天', description: '第一次相遇的日子', image: 'https://picsum.photos/600/400?random=1' },
+                        { id: 2, date: '2023-10-15', title: '第一次约会', description: '一起看电影和吃饭', image: 'https://picsum.photos/600/400?random=2' },
+                        { id: 3, date: '2023-11-08', title: '确定关系', description: '正式成为情侣', image: 'https://picsum.photos/600/400?random=3' }
+                    ];
+                } else {
+                    // 生产环境获取真实数据
+                    const response = await fetch(`${API_URL}/api/timeline`);
+                    timelineItems = await response.json();
+                }
+
+                // 更新表格
+                timelineTableBody.innerHTML = '';
+                timelineItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.date}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.title}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">${item.description}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <img src="${item.image}" alt="${item.title}" class="h-12 w-12 rounded object-cover">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <button class="text-primary hover:text-primary/80 mr-3 edit-timeline" data-id="${item.id}">
+                                <i class="fa fa-pencil"></i> 编辑
+                            </button>
+                            <button class="text-red-500 hover:text-red-600 delete-timeline" data-id="${item.id}">
+                                <i class="fa fa-trash"></i> 删除
+                            </button>
+                        </td>
+                    `;
+                    timelineTableBody.appendChild(row);
+                });
+
+                // 绑定编辑和删除按钮事件
+                document.querySelectorAll('.edit-timeline').forEach(btn => {
+                    btn.addEventListener('click', () => editTimeline(btn.dataset.id));
+                });
+                document.querySelectorAll('.delete-timeline').forEach(btn => {
+                    btn.addEventListener('click', () => deleteTimeline(btn.dataset.id));
+                });
+            } catch (error) {
+                console.error('加载时间轴数据错误:', error);
+                // 显示错误通知
+            }
+        }
+
+        // 加载相册数据
+        async function loadAlbumData() {
+            try {
+                // 本地开发环境模拟数据
+                let albumItems;
+                if (API_URL.includes('localhost')) {
+                    albumItems = [
+                        { id: 1, title: '旅行回忆', description: '我们一起去过的地方', coverImage: 'https://picsum.photos/600/400?random=4', photoCount: 24 },
+                        { id: 2, title: '美食日记', description: '一起品尝的美食', coverImage: 'https://picsum.photos/600/400?random=5', photoCount: 18 },
+                        { id: 3, title: '纪念日', description: '特殊的日子', coverImage: 'https://picsum.photos/600/400?random=6', photoCount: 12 }
+                    ];
+                } else {
+                    // 生产环境获取真实数据
+                    const response = await fetch(`${API_URL}/api/albums`);
+                    albumItems = await response.json();
+                }
+
+                // 更新相册网格
+                albumGrid.innerHTML = '';
+                albumItems.forEach(album => {
+                    const albumCard = document.createElement('div');
+                    albumCard.className = 'bg-white rounded-xl shadow overflow-hidden card-hover';
+                    albumCard.innerHTML = `
+                        <div class="h-48 overflow-hidden">
+                            <img src="${album.coverImage}" alt="${album.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-semibold mb-2">${album.title}</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">${album.description}</p>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm text-gray-500"><i class="fa fa-image mr-1"></i> ${album.photoCount} 张照片</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary hover:bg-primary/90 text-white py-2 px-4 rounded-lg transition-all duration-300 text-sm edit-album" data-id="${album.id}">
+                                    <i class="fa fa-pencil mr-1"></i> 编辑
+                                </button>
+                                <button class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-all duration-300 text-sm delete-album" data-id="${album.id}">
+                                    <i class="fa fa-trash mr-1"></i> 删除
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    albumGrid.appendChild(albumCard);
+                });
+
+                // 绑定编辑和删除按钮事件
+                document.querySelectorAll('.edit-album').forEach(btn => {
+                    btn.addEventListener('click', () => editAlbum(btn.dataset.id));
+                });
+                document.querySelectorAll('.delete-album').forEach(btn => {
+                    btn.addEventListener('click', () => deleteAlbum(btn.dataset.id));
+                });
+            } catch (error) {
+                console.error('加载相册数据错误:', error);
+                // 显示错误通知
+            }
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 侧边栏切换
+            toggleSidebarBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+            closeSidebarBtn.addEventListener('click', () => {
+                sidebar.classList.add('-translate-x-full');
+            });
+
+            // 侧边栏菜单切换
+            sidebarIcons.forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    // 移除所有激活状态
+                    sidebarIcons.forEach(i => i.classList.remove('sidebar-icon-active'));
+                    // 添加当前激活状态
+                    icon.classList.add('sidebar-icon-active');
+
+                    // 隐藏所有区域
+                    sections.forEach(section => section.classList.add('hidden'));
+
+                    // 显示对应的区域
+                    const target = icon.getAttribute('href').substring(1);
+                    document.getElementById(target).classList.remove('hidden');
+                });
+            });
+
+            // 退出登录
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('authToken');
+                window.location.href = LOGIN_URL;
+            });
+
+            // 添加时间轴项目
+            addTimelineBtn.addEventListener('click', () => {
+                timelineModalTitle.textContent = '添加时间轴项目';
+                document.getElementById('timelineId').value = '';
+                timelineForm.reset();
+                timelineModal.classList.remove('hidden');
+            });
+
+            // 添加相册
+            addAlbumBtn.addEventListener('click', () => {
+                albumModalTitle.textContent = '添加相册';
+                document.getElementById('albumId').value = '';
+                albumForm.reset();
+                albumModal.classList.remove('hidden');
+            });
+
+            // 关闭时间轴模态框
+            closeTimelineModalBtn.addEventListener('click', () => {
+                timelineModal.classList.add('hidden');
+            });
+            cancelTimelineBtn.addEventListener('click', () => {
+                timelineModal.classList.add('hidden');
+            });
+
+            // 关闭相册模态框
+            closeAlbumModalBtn.addEventListener('click', () => {
+                albumModal.classList.add('hidden');
+            });
+            cancelAlbumBtn.addEventListener('click', () => {
+                albumModal.classList.add('hidden');
+            });
+
+            // 提交时间轴表单
+            timelineForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const id = document.getElementById('timelineId').value;
+                const date = document.getElementById('timelineDate').value;
+                const title = document.getElementById('timelineTitle').value;
+                const description = document.getElementById('timelineDescription').value;
+                const image = document.getElementById('timelineImage').value;
+
+                const timelineData = { date, title, description, image };
+
+                try {
+                    // 本地开发环境模拟
+                    if (API_URL.includes('localhost')) {
+                        // 模拟API调用延迟
+                        await new Promise(resolve => setTimeout(resolve, 500));
+
+                        if (id) {
+                            // 模拟更新
+                            console.log('更新时间轴项目:', id, timelineData);
+                        } else {
+                            // 模拟添加
+                            console.log('添加时间轴项目:', timelineData);
+                        }
+                    } else {
+                        // 生产环境API调用
+                        if (id) {
+                            // 更新
+                            await fetch(`${API_URL}/api/timeline/${id}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                                },
+                                body: JSON.stringify(timelineData)
+                            });
+                        } else {
+                            // 添加
+                            await fetch(`${API_URL}/api/timeline`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                                },
+                                body: JSON.stringify(timelineData)
+                            });
+                        }
+                    }
+
+                    // 关闭模态框并重新加载数据
+                    timelineModal.classList.add('hidden');
+                    await loadTimelineData();
+                    await loadDashboardData();
+                } catch (error) {
+                    console.error('保存时间轴项目错误:', error);
+                    // 显示错误通知
+                }
+            });
+
+            // 提交相册表单
+            albumForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const id = document.getElementById('albumId').value;
+                const title = document.getElementById('albumTitle').value;
+                const description = document.getElementById('albumDescription').value;
+                const coverImage = document.getElementById('albumCover').value;
+                const photoCount = document.getElementById('albumPhotoCount').value;
+
+                const albumData = { title, description, coverImage, photoCount };
+
+                try {
+                    // 本地开发环境模拟
+                    if (API_URL.includes('localhost')) {
+                        // 模拟API调用延迟
+                        await new Promise(resolve => setTimeout(resolve, 500));
+
+                        if (id) {
+                            // 模拟更新
+                            console.log('更新相册:', id, albumData);
+                        } else {
+                            // 模拟添加
+                            console.log('添加相册:', albumData);
+                        }
+                    } else {
+                        // 生产环境API调用
+                        if (id) {
+                            // 更新
+                            await fetch(`${API_URL}/api/albums/${id}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                                },
+                                body: JSON.stringify(albumData)
+                            });
+                        } else {
+                            // 添加
+                            await fetch(`${API_URL}/api/albums`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                                },
+                                body: JSON.stringify(albumData)
+                            });
+                        }
+                    }
+
+                    // 关闭模态框并重新加载数据
+                    albumModal.classList.add('hidden');
+                    await loadAlbumData();
+                    await loadDashboardData();
+                } catch (error) {
+                    console.error('保存相册错误:', error);
+                    // 显示错误通知
+                }
+            });
+
+            // 提交设置表单
+            settingsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                // 简单验证
+                if (newPassword && newPassword !== confirmPassword) {
+                    alert('新密码和确认密码不匹配');
+                    return;
+                }
+
+                const settingsData = { username, email };
+                if (currentPassword && newPassword) {
+                    settingsData.currentPassword = currentPassword;
+                    settingsData.newPassword = newPassword;
+                }
+
+                try {
+                    // 本地开发环境模拟
+                    if (API_URL.includes('localhost')) {
+                        // 模拟API调用延迟
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        console.log('保存账户设置:', settingsData);
+                    } else {
+                        // 生产环境API调用
+                        await fetch(`${API_URL}/api/settings`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                            },
+                            body: JSON.stringify(settingsData)
+                        });
+                    }
+
+                    alert('设置已保存');
+                } catch (error) {
+                    console.error('保存设置错误:', error);
+                    alert('保存设置失败，请稍后重试');
+                }
+            });
+        }
+
+        // 编辑时间轴项目
+        async function editTimeline(id) {
+            try {
+                let timelineItem;
+
+                // 本地开发环境模拟数据
+                if (API_URL.includes('localhost')) {
+                    timelineItem = {
+                        id: parseInt(id),
+                        date: `2023-${10 + parseInt(id)}-${5 + parseInt(id)}`,
+                        title: `时间轴项目 ${id}`,
+                        description: `这是第 ${id} 个时间轴项目的描述`,
+                        image: `https://picsum.photos/600/400?random=${id}`
+                    };
+                } else {
+                    // 生产环境获取真实数据
+                    const response = await fetch(`${API_URL}/api/timeline/${id}`);
+                    timelineItem = await response.json();
+                }
+
+                // 填充表单
+                document.getElementById('timelineId').value = timelineItem.id;
+                document.getElementById('timelineDate').value = timelineItem.date;
+                document.getElementById('timelineTitle').value = timelineItem.title;
+                document.getElementById('timelineDescription').value = timelineItem.description;
+                document.getElementById('timelineImage').value = timelineItem.image || '';
+
+                // 显示模态框
+                timelineModalTitle.textContent = '编辑时间轴项目';
+                timelineModal.classList.remove('hidden');
+            } catch (error) {
+                console.error('获取时间轴项目错误:', error);
+                // 显示错误通知
+            }
+        }
+
+        // 删除时间轴项目
+        async function deleteTimeline(id) {
+            if (!confirm('确定要删除这个时间轴项目吗？')) {
+                return;
+            }
+
+            try {
+                // 本地开发环境模拟
+                if (API_URL.includes('localhost')) {
+                    // 模拟API调用延迟
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    console.log('删除时间轴项目:', id);
+                } else {
+                    // 生产环境API调用
+                    await fetch(`${API_URL}/api/timeline/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
+                }
+
+                // 重新加载数据
+                await loadTimelineData();
+                await loadDashboardData();
+            } catch (error) {
+                console.error('删除时间轴项目错误:', error);
+                // 显示错误通知
+            }
+        }
+
+        // 编辑相册
+        async function editAlbum(id) {
+            try {
+                let albumItem;
+
+                // 本地开发环境模拟数据
+                if (API_URL.includes('localhost')) {
+                    albumItem = {
+                        id: parseInt(id),
+                        title: `相册 ${id}`,
+                        description: `这是第 ${id} 个相册的描述`,
+                        coverImage: `https://picsum.photos/600/400?random=${3 + parseInt(id)}`,
+                        photoCount: 10 + parseInt(id) * 5
+                    };
+                } else {
+                    // 生产环境获取真实数据
+                    const response = await fetch(`${API_URL}/api/albums/${id}`);
+                    albumItem = await response.json();
+                }
+
+                // 填充表单
+                document.getElementById('albumId').value = albumItem.id;
+                document.getElementById('albumTitle').value = albumItem.title;
+                document.getElementById('albumDescription').value = albumItem.description;
+                document.getElementById('albumCover').value = albumItem.coverImage;
+                document.getElementById('albumPhotoCount').value = albumItem.photoCount;
+
+                // 显示模态框
+                albumModalTitle.textContent = '编辑相册';
+                albumModal.classList.remove('hidden');
+            } catch (error) {
+                console.error('获取相册错误:', error);
+                // 显示错误通知
+            }
+        }
+
+        // 删除相册
+        async function deleteAlbum(id) {
+            if (!confirm('确定要删除这个相册吗？')) {
+                return;
+            }
+
+            try {
+                // 本地开发环境模拟
+                if (API_URL.includes('localhost')) {
+                    // 模拟API调用延迟
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    console.log('删除相册:', id);
+                } else {
+                    // 生产环境API调用
+                    await fetch(`${API_URL}/api/albums/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
+                }
+
+                // 重新加载数据
+                await loadAlbumData();
+                await loadDashboardData();
+            } catch (error) {
+                console.error('删除相册错误:', error);
+                // 显示错误通知
+            }
+        }
+    </script>
+</body>
+</html>

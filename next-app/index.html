@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Love Story | 情侣记忆空间</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF6B8B',
+            secondary: '#FFB6C1',
+            accent: '#FF9A9E',
+            dark: '#333333',
+            light: '#FFF5F7'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .scroll-trigger {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      }
+      .scroll-trigger.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .memory-item:hover {
+        transform: scale(1.02);
+        transition: all 0.3s ease;
+      }
+      .timeline-line {
+        height: 100%;
+        width: 2px;
+        background-color: #FF6B8B;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .timeline-dot {
+        height: 20px;
+        width: 20px;
+        background-color: #FF6B8B;
+        border-radius: 50%;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .timer-card {
+        background: linear-gradient(145deg, #ffe6ea, #ffffff);
+        box-shadow:  20px 20px 60px #f5e6e8, 
+                    -20px -20px 60px #ffffff;
+      }
+      .timer-number {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+</head>
+<body class="bg-light font-sans text-dark min-h-screen flex flex-col">
+  <!-- 导航栏 -->
+  <header id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="#home" class="flex items-center space-x-2">
+        <i class="fa fa-heart text-primary text-2xl"></i>
+        <span class="text-xl font-bold text-primary">Love Story</span>
+      </a>
+      
+      <nav class="hidden md:flex items-center space-x-8">
+        <a href="#home" class="font-medium hover:text-primary transition-colors">首页</a>
+        <a href="#timeline" class="font-medium hover:text-primary transition-colors">时间轴</a>
+        <a href="#album" class="font-medium hover:text-primary transition-colors">相册</a>
+        <a href="#photos" class="font-medium hover:text-primary transition-colors">照片墙</a>
+        <a href="#journal" class="font-medium hover:text-primary transition-colors">日记本</a>
+        <a href="admin-login.html" class="bg-primary/10 text-primary px-4 py-2 rounded-full hover:bg-primary/20 transition-colors inline-flex items-center">
+          <i class="fa fa-lock mr-1"></i> 管理员登录
+        </a>
+      </nav>
+      
+      <button id="menu-toggle" class="md:hidden text-dark text-xl">
+        <i class="fa fa-bars"></i>
+      </button>
+    </div>
+    
+    <!-- 移动端菜单 -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg absolute w-full">
+      <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+        <a href="#home" class="font-medium py-2 hover:text-primary transition-colors">首页</a>
+        <a href="#timeline" class="font-medium py-2 hover:text-primary transition-colors">时间轴</a>
+        <a href="#album" class="font-medium py-2 hover:text-primary transition-colors">相册</a>
+        <a href="#photos" class="font-medium py-2 hover:text-primary transition-colors">照片墙</a>
+        <a href="#journal" class="font-medium py-2 hover:text-primary transition-colors">日记本</a>
+        <a href="admin-login.html" class="w-full bg-primary/10 text-primary px-4 py-2 rounded-full hover:bg-primary/20 transition-colors mt-2 flex items-center justify-center">
+          <i class="fa fa-lock mr-1"></i> 管理员登录
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 英雄区（在一起计时器） -->
+  <section id="home" class="pt-24 pb-16 md:pt-32 md:pb-24 bg-gradient-to-b from-light to-white min-h-screen flex items-center">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-10 scroll-trigger">
+          <h1 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold mb-4">我们在一起的时间</h1>
+          <p class="text-gray-600 max-w-2xl mx-auto">从相识到现在，每一分每一秒都值得珍惜</p>
+        </div>
+
+        <div class="timer-card rounded-3xl p-8 md:p-12 mb-10 scroll-trigger">
+          <div class="grid grid-cols-4 gap-4 md:gap-8">
+            <div class="text-center">
+              <div id="days" class="timer-number text-[clamp(2.5rem,6vw,4rem)] font-bold text-primary mb-2">0</div>
+              <div class="text-gray-600 text-lg">天</div>
+            </div>
+            <div class="text-center">
+              <div id="hours" class="timer-number text-[clamp(2.5rem,6vw,4rem)] font-bold text-primary mb-2">0</div>
+              <div class="text-gray-600 text-lg">时</div>
+            </div>
+            <div class="text-center">
+              <div id="minutes" class="timer-number text-[clamp(2.5rem,6vw,4rem)] font-bold text-primary mb-2">0</div>
+              <div class="text-gray-600 text-lg">分</div>
+            </div>
+            <div class="text-center">
+              <div id="seconds" class="timer-number text-[clamp(2.5rem,6vw,4rem)] font-bold text-primary mb-2">0</div>
+              <div class="text-gray-600 text-lg">秒</div>
+            </div>
+          </div>
+          
+          <div class="mt-8 text-center">
+            <div class="text-gray-500 mb-2" id="start-date">开始于: 2023年1月15日</div>
+            <div class="text-gray-500" id="total-seconds">总共: 0 秒</div>
+          </div>
+        </div>
+
+        <div class="flex justify-center scroll-trigger">
+          <button id="view-all-btn" class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-full text-lg font-medium transition-all transform hover:scale-105 shadow-lg shadow-primary/20">
+            <i class="fa fa-book mr-2"></i> 浏览全部回忆
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 统计数据 -->
+  <section class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="p-6 bg-light rounded-xl shadow-sm scroll-trigger">
+          <div class="text-4xl font-bold text-primary mb-2">456</div>
+          <div class="text-gray-600">共同回忆</div>
+        </div>
+        <div class="p-6 bg-light rounded-xl shadow-sm scroll-trigger" style="transition-delay: 0.1s;">
+          <div class="text-4xl font-bold text-primary mb-2">365</div>
+          <div class="text-gray-600">恋爱天数</div>
+        </div>
+        <div class="p-6 bg-light rounded-xl shadow-sm scroll-trigger" style="transition-delay: 0.2s;">
+          <div class="text-4xl font-bold text-primary mb-2">128</div>
+          <div class="text-gray-600">旅行地点</div>
+        </div>
+        <div class="p-6 bg-light rounded-xl shadow-sm scroll-trigger" style="transition-delay: 0.3s;">
+          <div class="text-4xl font-bold text-primary mb-2">52</div>
+          <div class="text-gray-600">纪念日</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 时间轴 -->
+  <section id="timeline" class="py-16 bg-light">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12 scroll-trigger">
+        <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold mb-4">爱情时间轴</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">记录我们在一起的每一个重要时刻，回顾我们的爱情旅程。</p>
+      </div>
+
+      <div class="relative">
+        <!-- 时间线 -->
+        <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-2 bg-primary/30 z-0"></div>
+
+        <!-- 时间点1 -->
+        <div class="relative z-10 mb-16 flex flex-col md:flex-row items-center scroll-trigger">
+          <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 mt-4 md:mt-0">
+            <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
+              <div class="flex justify-between items-center mb-3">
+              <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2023-01-15</span>
+              <div class="edit-buttons hidden">
+                <button class="edit-timeline-btn text-primary hover:text-primary/80 mr-2" data-id="1">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="delete-timeline-btn text-red-500 hover:text-red-700" data-id="1">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <h3 class="text-xl font-bold text-primary mb-2">第一次约会</h3>
+            <p class="text-gray-600 mb-3">在咖啡厅的初次相遇，我们聊了整整一个下午，仿佛时间静止了。</p>
+            <div class="flex justify-end">
+              <img src="https://picsum.photos/seed/firstdate/400/300" alt="第一次约会照片" class="w-full md:w-2/3 rounded-lg">
+            </div>
+            </div>
+          </div>
+          <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-1 timeline-dot">1</div>
+          <div class="md:w-1/2 md:pl-12 hidden md:block order-3"></div>
+        </div>
+
+        <!-- 时间点2 -->
+        <div class="relative z-10 mb-16 flex flex-col md:flex-row items-center scroll-trigger">
+          <div class="md:w-1/2 md:pr-12 hidden md:block order-1"></div>
+          <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-2 timeline-dot">2</div>
+          <div class="md:w-1/2 md:pl-12 order-3 mt-4 md:mt-0">
+            <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
+              <div class="flex justify-between items-center mb-3">
+              <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2023-03-20</span>
+              <div class="edit-buttons hidden">
+                <button class="edit-timeline-btn text-primary hover:text-primary/80 mr-2" data-id="2">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="delete-timeline-btn text-red-500 hover:text-red-700" data-id="2">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <h3 class="text-xl font-bold text-primary mb-2">确定关系</h3>
+            <p class="text-gray-600 mb-3">在樱花树下，我向你表白，你害羞地点了点头，从此我们成为了彼此的依靠。</p>
+            <div class="flex justify-start">
+              <img src="https://picsum.photos/seed/relationship/400/300" alt="确定关系照片" class="w-full md:w-2/3 rounded-lg">
+            </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 时间点3 -->
+        <div class="relative z-10 mb-16 flex flex-col md:flex-row items-center scroll-trigger">
+          <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 mt-4 md:mt-0">
+            <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
+              <div class="flex justify-between items-center mb-3">
+              <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2023-07-01</span>
+              <div class="edit-buttons hidden">
+                <button class="edit-timeline-btn text-primary hover:text-primary/80 mr-2" data-id="3">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="delete-timeline-btn text-red-500 hover:text-red-700" data-id="3">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <h3 class="text-xl font-bold text-primary mb-2">第一次旅行</h3>
+            <p class="text-gray-600 mb-3">我们一起去了海边，看日出日落，踩在沙滩上，感受海风的拥抱。</p>
+            <div class="flex justify-end">
+              <img src="https://picsum.photos/seed/firsttrip/400/300" alt="第一次旅行照片" class="w-full md:w-2/3 rounded-lg">
+            </div>
+            </div>
+          </div>
+          <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-1 timeline-dot">3</div>
+          <div class="md:w-1/2 md:pl-12 hidden md:block order-3"></div>
+        </div>
+
+        <!-- 时间点4 -->
+        <div class="relative z-10 mb-16 flex flex-col md:flex-row items-center scroll-trigger">
+          <div class="md:w-1/2 md:pr-12 hidden md:block order-1"></div>
+          <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-2 timeline-dot">4</div>
+          <div class="md:w-1/2 md:pl-12 order-3 mt-4 md:mt-0">
+            <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
+              <div class="flex justify-between items-center mb-3">
+              <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2023-12-25</span>
+              <div class="edit-buttons hidden">
+                <button class="edit-timeline-btn text-primary hover:text-primary/80 mr-2" data-id="4">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="delete-timeline-btn text-red-500 hover:text-red-700" data-id="4">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <h3 class="text-xl font-bold text-primary mb-2">第一个圣诞节</h3>
+            <p class="text-gray-600 mb-3">一起装饰圣诞树，交换礼物，度过了一个温馨浪漫的圣诞节。</p>
+            <div class="flex justify-start">
+              <img src="https://picsum.photos/seed/christmas/400/300" alt="第一个圣诞节照片" class="w-full md:w-2/3 rounded-lg">
+            </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 时间点5 -->
+        <div class="relative z-10 flex flex-col md:flex-row items-center scroll-trigger">
+          <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 mt-4 md:mt-0">
+            <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
+              <div class="flex justify-between items-center mb-3">
+              <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2024-05-20</span>
+              <div class="edit-buttons hidden">
+                <button class="edit-timeline-btn text-primary hover:text-primary/80 mr-2" data-id="5">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="delete-timeline-btn text-red-500 hover:text-red-700" data-id="5">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <h3 class="text-xl font-bold text-primary mb-2">一周年纪念日</h3>
+            <p class="text-gray-600 mb-3">在我们第一次约会的餐厅庆祝一周年，重温了当初的甜蜜和感动。</p>
+            <div class="flex justify-end">
+              <img src="https://picsum.photos/seed/anniversary/400/300" alt="一周年纪念日照片" class="w-full md:w-2/3 rounded-lg">
+            </div>
+            </div>
+          </div>
+          <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-1 timeline-dot">5</div>
+          <div class="md:w-1/2 md:pl-12 hidden md:block order-3"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 相册 -->
+  <section id="album" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12 scroll-trigger">
+        <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold mb-4">爱情相册</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">创建和管理我们的专属相册，分类保存每一段美好回忆。</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- 相册1 -->
+        <div class="bg-light rounded-xl overflow-hidden shadow-lg card-hover scroll-trigger">
+          <div class="relative h-64">
+            <img src="https://picsum.photos/seed/album1/600/400" alt="旅行相册封面" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <h3 class="text-white text-xl font-bold">旅行回忆</h3>
+            </div>
+            <div class="absolute top-2 right-2 edit-buttons hidden">
+              <button class="edit-album-btn text-white hover:text-primary mr-2" data-id="1">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="delete-album-btn text-white hover:text-red-500" data-id="1">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">12个地点 · 48张照片</span>
+              <button class="text-primary hover:text-primary/80">
+                <i class="fa fa-heart-o"></i>
+              </button>
+            </div>
+            <div class="flex justify-end mt-3">
+              <a href="album-detail.html?id=1" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+                查看相册 <i class="fa fa-angle-right ml-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 相册2 -->
+        <div class="bg-light rounded-xl overflow-hidden shadow-lg card-hover scroll-trigger" style="transition-delay: 0.1s;">
+          <div class="relative h-64">
+            <img src="https://picsum.photos/seed/album2/600/400" alt="美食相册封面" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <h3 class="text-white text-xl font-bold">美食日记</h3>
+            </div>
+            <div class="absolute top-2 right-2 edit-buttons hidden">
+              <button class="edit-album-btn text-white hover:text-primary mr-2" data-id="2">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="delete-album-btn text-white hover:text-red-500" data-id="2">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">8家餐厅 · 36张照片</span>
+              <button class="text-primary hover:text-primary/80">
+                <i class="fa fa-heart-o"></i>
+              </button>
+            </div>
+            <div class="flex justify-end mt-3">
+              <a href="album-detail.html?id=2" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+                查看相册 <i class="fa fa-angle-right ml-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 相册3 -->
+        <div class="bg-light rounded-xl overflow-hidden shadow-lg card-hover scroll-trigger" style="transition-delay: 0.2s;">
+          <div class="relative h-64">
+            <img src="https://picsum.photos/seed/album3/600/400" alt="纪念日相册封面" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <h3 class="text-white text-xl font-bold">纪念日</h3>
+            </div>
+            <div class="absolute top-2 right-2 edit-buttons hidden">
+              <button class="edit-album-btn text-white hover:text-primary mr-2" data-id="3">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="delete-album-btn text-white hover:text-red-500" data-id="3">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">5个纪念日 · 24张照片</span>
+              <button class="text-primary hover:text-primary/80">
+                <i class="fa fa-heart-o"></i>
+              </button>
+            </div>
+            <div class="flex justify-end mt-3">
+              <a href="album-detail.html?id=3" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+                查看相册 <i class="fa fa-angle-right ml-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 相册4 -->
+        <div class="bg-light rounded-xl overflow-hidden shadow-lg card-hover scroll-trigger">
+          <div class="relative h-64">
+            <img src="https://picsum.photos/seed/album4/600/400" alt="日常生活相册封面" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <h3 class="text-white text-xl font-bold">日常生活</h3>
+            </div>
+            <div class="absolute top-2 right-2 edit-buttons hidden">
+              <button class="edit-album-btn text-white hover:text-primary mr-2" data-id="4">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="delete-album-btn text-white hover:text-red-500" data-id="4">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">120个日常 · 192张照片</span>
+              <button class="text-primary hover:text-primary/80">
+                <i class="fa fa-heart-o"></i>
+              </button>
+            </div>
+            <div class="flex justify-end mt-3">
+              <a href="album-detail.html?id=4" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+                查看相册 <i class="fa fa-angle-right ml-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 相册5 -->
+        <div class="bg-light rounded-xl overflow-hidden shadow-lg card-hover scroll-trigger" style="transition-delay: 0.1s;">
+          <div class="relative h-64">
+            <img src="https://picsum.photos/seed/album5/600/400" alt="礼物相册封面" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <h3 class="text-white text-xl font-bold">礼物回忆</h3>
+            </div>
+            <div class="absolute top-2 right-2 edit-buttons hidden">
+              <button class="edit-album-btn text-white hover:text-primary mr-2" data-id="5">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="delete-album-btn text-white hover:text-red-500" data-id="5">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">24份礼物 · 36张照片</span>
+              <button class="text-primary hover:text-primary/80">
+                <i class="fa fa-heart-o"></i>
+              </button>
+            </div>
+            <div class="flex justify-end mt-3">
+              <a href="album-detail.html?id=5" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+                查看相册 <i class="fa fa-angle-right ml-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 照片墙 -->
+  <section id="photos" class="py-16 bg-light">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12 scroll-trigger">
+        <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold mb-4">照片墙</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">浏览我们所有的照片，重温每一个甜蜜瞬间。</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- 照片1 -->
+        <div class="relative overflow-hidden rounded-xl aspect-square group scroll-trigger">
+          <img src="https://picsum.photos/seed/photo1/400/400" alt="情侣合影" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div class="text-white text-center p-4">
+              <h4 class="font-bold mb-1">海边漫步</h4>
+              <p class="text-sm">2023-07-15</p>
+            </div>
+          </div>
+        </div>
+        <!-- 照片2 -->
+        <div class="relative overflow-hidden rounded-xl aspect-square group scroll-trigger" style="transition-delay: 0.1s;">
+          <img src="https://picsum.photos/seed/photo2/400/400" alt="生日蛋糕" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div class="text-white text-center p-4">
+              <h4 class="font-bold mb-1">生日惊喜</h4>
+              <p class="text-sm">2023-10-20</p>
+            </div>
+          </div>
+        </div>
+        <!-- 照片3 -->
+        <div class="relative overflow-hidden rounded-xl aspect-square group scroll-trigger" style="transition-delay: 0.2s;">
+          <img src="https://picsum.photos/seed/photo3/400/400" alt="圣诞节装饰" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div class="text-white text-center p-4">
+              <h4 class="font-bold mb-1">圣诞快乐</h4>
+              <p class="text-sm">2023-12-25</p>
+            </div>
+          </div>
+        </div>
+        <!-- 照片4 -->
+        <div class="relative overflow-hidden rounded-xl aspect-square group scroll-trigger" style="transition-delay: 0.3s;">
+          <img src="https://picsum.photos/seed/photo4/400/400" alt="音乐会" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div class="text-white text-center p-4">
+              <h4 class="font-bold mb-1">音乐会</h4>
+              <p class="text-sm">2024-03-10</p>
+            </div>
+          </div>
+        </div>
+        <!-- 照片5 -->
+        <div class="relative overflow-hidden rounded-xl aspect-square group scroll-trigger">
+          <img src="https://picsum.photos/seed/photo5/400/400" alt="爬山" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div class="text-white text-center p-4">
+              <h4 class="font-bold mb-1">山顶风景</h4>
+              <p class="text-sm">2024-04-05</p>
+            </div>
+          </div>
+        </div>
+        <!-- 照片6 -->
+        <div class="relative overflow-hidden rounded-xl aspect-square group scroll-trigger" style="transition-delay: 0.1s;">
+          <img src="https://picsum.photos/seed/photo6/400/400" alt="餐厅美食" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div class="text-white text-center p-4">
+              <h4 class="font-bold mb-1">浪漫晚餐</h4>
+              <p class="text-sm">2024-05-20</p>
+            </div>
+          </div>
+        </div>
+        <!-- 照片7 -->
+        <div class="relative overflow-hidden rounded-xl aspect-square group scroll-trigger" style="transition-delay: 0.2s;">
+          <img src="https://picsum.photos/seed/photo7/400/400" alt="城市夜景" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div class="text-white text-center p-4">
+              <h4 class="font-bold mb-1">城市夜景</h4>
+              <p class="text-sm">2024-06-15</p>
+            </div>
+          </div>
+        </div>
+        <!-- 照片8 -->
+        <div class="relative overflow-hidden rounded-xl aspect-square group scroll-trigger" style="transition-delay: 0.3s;">
+          <img src="https://picsum.photos/seed/photo8/400/400" alt="公园散步" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div class="text-white text-center p-4">
+              <h4 class="font-bold mb-1">公园漫步</h4>
+              <p class="text-sm">2024-07-10</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-12">
+        <button class="bg-white hover:bg-gray-50 text-primary border-2 border-primary px-6 py-3 rounded-full font-medium transition-all transform hover:scale-105">
+          查看更多照片
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 日记本 -->
+  <section id="journal" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12 scroll-trigger">
+        <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold mb-4">爱情日记本</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">记录我们的心情、想法和感受，分享彼此的内心世界。</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- 日记列表 -->
+        <div class="scroll-trigger">
+          <div class="bg-light rounded-2xl p-6 shadow-lg mb-8">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-xl font-bold">最近的日记</h3>
+              <div class="relative">
+                <input type="text" placeholder="搜索日记..." class="px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                <i class="fa fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
+            </div>
+            
+            <div class="space-y-6">
+              <!-- 日记1 -->
+              <div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start mb-3">
+                  <h4 class="font-bold text-lg">今天的约会太棒了</h4>
+                  <span class="text-sm text-gray-500">2024-07-25</span>
+                </div>
+                <p class="text-gray-600 mb-3">今天和你一起去了那家新开的餐厅，环境很安静，食物也很美味。最开心的是我们聊了很多，感觉彼此更加了解了。我爱你！</p>
+                <div class="flex justify-between items-center">
+                  <div class="flex items-center">
+                    <img src="https://picsum.photos/seed/person1/40/40" alt="小明头像" class="w-8 h-8 rounded-full border-2 border-white">
+                    <span class="ml-2 text-sm font-medium">小明</span>
+                  </div>
+                  <div class="text-yellow-400">
+                    <i class="fa fa-smile-o text-xl"></i>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 日记2 -->
+              <div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start mb-3">
+                  <h4 class="font-bold text-lg">想念你的每一天</h4>
+                  <span class="text-sm text-gray-500">2024-07-20</span>
+                </div>
+                <p class="text-gray-600 mb-3">虽然你出差才两天，但我已经开始想你了。今天看到你给我买的礼物，心里暖暖的。希望你一切都好，早点回来。</p>
+                <div class="flex justify-between items-center">
+                  <div class="flex items-center">
+                    <img src="https://picsum.photos/seed/person2/40/40" alt="小红头像" class="w-8 h-8 rounded-full border-2 border-white">
+                    <span class="ml-2 text-sm font-medium">小红</span>
+                  </div>
+                  <div class="text-yellow-400">
+                    <i class="fa fa-smile text-xl"></i>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 日记3 -->
+              <div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start mb-3">
+                  <h4 class="font-bold text-lg">美好的周末</h4>
+                  <span class="text-sm text-gray-500">2024-07-15</span>
+                </div>
+                <p class="text-gray-600 mb-3">这个周末我们一起去了公园，天气很好，阳光明媚。我们散步、聊天、拍照，感觉时间过得特别快。和你在一起的每一刻都很珍贵。</p>
+                <div class="flex justify-between items-center">
+                  <div class="flex items-center">
+                    <img src="https://picsum.photos/seed/person1/40/40" alt="小明头像" class="w-8 h-8 rounded-full border-2 border-white">
+                    <span class="ml-2 text-sm font-medium">小明</span>
+                  </div>
+                  <div class="text-yellow-400">
+                    <i class="fa fa-smile-o text-xl"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 最近的心情 -->
+        <div class="scroll-trigger">
+          <div class="bg-light rounded-2xl p-6 shadow-lg mb-8">
+            <h3 class="text-xl font-bold mb-6">最近的心情</h3>
+            
+            <div class="mb-8">
+              <div class="flex justify-between items-center mb-3">
+                <span class="font-medium">心情统计</span>
+                <span class="text-sm text-gray-500">过去30天</span>
+              </div>
+              <div class="grid grid-cols-5 gap-2 text-center">
+                <div class="p-3 bg-white rounded-lg shadow-sm">
+                  <div class="text-yellow-400 text-2xl mb-1"><i class="fa fa-smile-o"></i></div>
+                  <div class="text-sm">65%</div>
+                </div>
+                <div class="p-3 bg-white rounded-lg shadow-sm">
+                  <div class="text-yellow-500 text-2xl mb-1"><i class="fa fa-smile"></i></div>
+                  <div class="text-sm">20%</div>
+                </div>
+                <div class="p-3 bg-white rounded-lg shadow-sm">
+                  <div class="text-yellow-600 text-2xl mb-1"><i class="fa fa-meh-o"></i></div>
+                  <div class="text-sm">10%</div>
+                </div>
+                <div class="p-3 bg-white rounded-lg shadow-sm">
+                  <div class="text-yellow-700 text-2xl mb-1"><i class="fa fa-frown-o"></i></div>
+                  <div class="text-sm">3%</div>
+                </div>
+                <div class="p-3 bg-white rounded-lg shadow-sm">
+                  <div class="text-yellow-800 text-2xl mb-1"><i class="fa fa-tired"></i></div>
+                  <div class="text-sm">2%</div>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 class="font-bold mb-4">心情日历</h4>
+              <div class="grid grid-cols-7 gap-1 text-center">
+                <div class="text-xs text-gray-500">一</div>
+                <div class="text-xs text-gray-500">二</div>
+                <div class="text-xs text-gray-500">三</div>
+                <div class="text-xs text-gray-500">四</div>
+                <div class="text-xs text-gray-500">五</div>
+                <div class="text-xs text-gray-500">六</div>
+                <div class="text-xs text-gray-500">日</div>
+                
+                <!-- 日历格子 -->
+                <div class="h-8 flex items-center justify-center text-xs text-gray-400">24</div>
+                <div class="h-8 flex items-center justify-center text-xs text-gray-400">25</div>
+                <div class="h-8 flex items-center justify-center text-xs text-gray-400">26</div>
+                <div class="h-8 flex items-center justify-center text-xs text-gray-400">27</div>
+                <div class="h-8 flex items-center justify-center text-xs">28</div>
+                <div class="h-8 flex items-center justify-center text-xs">29</div>
+                <div class="h-8 flex items-center justify-center text-xs">30</div>
+                
+                <div class="h-8 flex items-center justify-center text-xs">1</div>
+                <div class="h-8 flex items-center justify-center text-xs">2</div>
+                <div class="h-8 flex items-center justify-center text-xs">3</div>
+                <div class="h-8 flex items-center justify-center text-xs bg-primary/10 rounded-full">4</div>
+                <div class="h-8 flex items-center justify-center text-xs">5</div>
+                <div class="h-8 flex items-center justify-center text-xs">6</div>
+                <div class="h-8 flex items-center justify-center text-xs">7</div>
+                
+                <div class="h-8 flex items-center justify-center text-xs">8</div>
+                <div class="h-8 flex items-center justify-center text-xs">9</div>
+                <div class="h-8 flex items-center justify-center text-xs bg-primary/10 rounded-full">10</div>
+                <div class="h-8 flex items-center justify-center text-xs">11</div>
+                <div class="h-8 flex items-center justify-center text-xs">12</div>
+                <div class="h-8 flex items-center justify-center text-xs">13</div>
+                <div class="h-8 flex items-center justify-center text-xs bg-primary/10 rounded-full">14</div>
+                
+                <div class="h-8 flex items-center justify-center text-xs">15</div>
+                <div class="h-8 flex items-center justify-center text-xs">16</div>
+                <div class="h-8 flex items-center justify-center text-xs">17</div>
+                <div class="h-8 flex items-center justify-center text-xs">18</div>
+                <div class="h-8 flex items-center justify-center text-xs bg-primary/10 rounded-full">19</div>
+                <div class="h-8 flex items-center justify-center text-xs">20</div>
+                <div class="h-8 flex items-center justify-center text-xs">21</div>
+                
+                <div class="h-8 flex items-center justify-center text-xs">22</div>
+                <div class="h-8 flex items-center justify-center text-xs">23</div>
+                <div class="h-8 flex items-center justify-center text-xs">24</div>
+                <div class="h-8 flex items-center justify-center text-xs bg-primary/10 rounded-full">25</div>
+                <div class="h-8 flex items-center justify-center text-xs">26</div>
+                <div class="h-8 flex items-center justify-center text-xs bg-primary/10 rounded-full">27</div>
+                <div class="h-8 flex items-center justify-center text-xs bg-primary/20 rounded-full">28</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 管理员登录模块 -->
+  <section id="admin-login" class="py-16 bg-white hidden">
+    <div class="container mx-auto px-4">
+      <div class="max-w-md mx-auto bg-light rounded-xl shadow-md overflow-hidden md:max-w-2xl p-8">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold text-primary">管理员登录</h2>
+          <p class="text-gray-600 mt-2">请输入您的管理员凭证以访问管理功能</p>
+        </div>
+        
+        <form id="login-form" class="space-y-6">
+          <div>
+            <label for="username" class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+            <input type="text" id="username" name="username" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+            <input type="password" id="password" name="password" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div>
+            <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+              登录
+            </button>
+          </div>
+          
+          <div id="login-error" class="text-red-500 text-sm text-center hidden"></div>
+        </form>
+        
+        <div id="admin-panel" class="hidden mt-8">
+          <h3 class="text-xl font-bold text-primary mb-4">管理员面板</h3>
+          <div class="flex space-x-4">
+            <button id="add-timeline-btn" class="bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary/90 transition-colors">
+              添加时间轴项
+            </button>
+            <button id="add-album-btn" class="bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary/90 transition-colors">
+              添加相册
+            </button>
+            <button id="logout-btn" class="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors">
+              退出登录
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="bg-primary text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <i class="fa fa-heart text-2xl"></i>
+            <span class="text-xl font-bold">Love Story</span>
+          </div>
+          <p class="text-white/80 mb-4">记录我们的爱情故事，珍藏每一刻美好回忆。</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-white hover:text-white/80"><i class="fa fa-weixin text-xl"></i></a>
+            <a href="#" class="text-white hover:text-white/80"><i class="fa fa-weibo text-xl"></i></a>
+            <a href="#" class="text-white hover:text-white/80"><i class="fa fa-instagram text-xl"></i></a>
+            <a href="#" class="text-white hover:text-white/80"><i class="fa fa-twitter text-xl"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-bold mb-4">快速链接</h3>
+          <ul class="space-y-2">
+            <li><a href="#home" class="text-white/80 hover:text-white">首页</a></li>
+            <li><a href="#timeline" class="text-white/80 hover:text-white">时间轴</a></li>
+            <li><a href="#album" class="text-white/80 hover:text-white">相册</a></li>
+            <li><a href="#photos" class="text-white/80 hover:text-white">照片墙</a></li>
+            <li><a href="#journal" class="text-white/80 hover:text-white">日记本</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-bold mb-4">联系我们</h3>
+          <ul class="space-y-2">
+            <li class="flex items-center">
+              <i class="fa fa-envelope-o mr-2"></i>
+              <span class="text-white/80">lovestory@example.com</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fa fa-phone mr-2"></i>
+              <span class="text-white/80">+86 131 **** 5678</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fa fa-map-marker mr-2"></i>
+              <span class="text-white/80">中国，北京市朝阳区</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-white/20 mt-8 pt-8 text-center text-white/60">
+        <p>&copy; 2024 Love Story. 保留所有权利。</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 照片查看模态框 -->
+  <div id="photo-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
+    <button id="close-modal" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300">
+      <i class="fa fa-times"></i>
+    </button>
+    <div class="relative max-w-4xl w-full">
+      <img id="modal-photo" src="" alt="大图预览" class="max-h-[80vh] mx-auto">
+      <div class="absolute bottom-4 left-0 right-0 text-center text-white">
+        <h4 id="modal-title" class="text-xl font-bold"></h4>
+        <p id="modal-date" class="text-sm opacity-80"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 返回顶部按钮 -->
+  <button id="back-to-top" class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg opacity-0 invisible transition-all z-50">
+    <i class="fa fa-arrow-up"></i>
+  </button>
+
+  <!-- JavaScript -->
+  <script>
+    // 导航栏滚动效果
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        navbar.classList.add('py-2', 'shadow-md');
+        navbar.classList.remove('py-3', 'shadow-sm');
+      } else {
+        navbar.classList.add('py-3', 'shadow-sm');
+        navbar.classList.remove('py-2', 'shadow-md');
+      }
+    });
+
+    // 移动端菜单
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+      if (mobileMenu.classList.contains('hidden')) {
+        menuToggle.innerHTML = '<i class="fa fa-bars"></i>';
+      } else {
+        menuToggle.innerHTML = '<i class="fa fa-times"></i>';
+      }
+    });
+
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+          
+          // 关闭移动菜单
+          if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+            menuToggle.innerHTML = '<i class="fa fa-bars"></i>';
+          }
+        }
+      });
+    });
+
+    // 返回顶部按钮
+    const backToTopBtn = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTopBtn.classList.remove('opacity-0', 'invisible');
+        backToTopBtn.classList.add('opacity-100', 'visible');
+      } else {
+        backToTopBtn.classList.add('opacity-0', 'invisible');
+        backToTopBtn.classList.remove('opacity-100', 'visible');
+      }
+    });
+    
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // 照片墙点击查看大图
+    const photoModal = document.getElementById('photo-modal');
+    const modalPhoto = document.getElementById('modal-photo');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDate = document.getElementById('modal-date');
+    const closeModal = document.getElementById('close-modal');
+
+    // 为每张照片添加点击事件
+    document.querySelectorAll('#photos .group').forEach(photo => {
+      photo.addEventListener('click', () => {
+        const img = photo.querySelector('img');
+        const title = photo.querySelector('h4').textContent;
+        const date = photo.querySelector('p').textContent;
+
+        modalPhoto.src = img.src;
+        modalTitle.textContent = title;
+        modalDate.textContent = date;
+        photoModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    // 关闭模态框
+    closeModal.addEventListener('click', () => {
+      photoModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    });
+
+    // 点击模态框外部关闭
+    photoModal.addEventListener('click', (e) => {
+      if (e.target === photoModal) {
+        photoModal.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // 滚动触发动画
+    function handleScrollAnimations() {
+      const scrollTriggers = document.querySelectorAll('.scroll-trigger');
+      scrollTriggers.forEach(trigger => {
+        const triggerPosition = trigger.getBoundingClientRect().top;
+        const screenPosition = window.innerHeight / 1.2;
+        
+        if (triggerPosition < screenPosition) {
+          trigger.classList.add('visible');
+        }
+      });
+    }
+    
+    window.addEventListener('scroll', handleScrollAnimations);
+    window.addEventListener('load', handleScrollAnimations);
+
+    // 计时器功能
+      function updateTimer() {
+        // 设置在一起的起始日期（格式：YYYY, MM-1, DD）
+        const startDate = new Date(2023, 9, 8); // 2023年10月8日
+        const now = new Date();
+        
+        // 计算时间差（毫秒）
+        const timeDiff = now - startDate;
+        
+        // 转换为天、时、分、秒
+        const totalSeconds = Math.floor(timeDiff / 1000);
+        const seconds = totalSeconds % 60;
+        const totalMinutes = Math.floor(totalSeconds / 60);
+        const minutes = totalMinutes % 60;
+        const totalHours = Math.floor(totalMinutes / 60);
+        const hours = totalHours % 24;
+        const days = Math.floor(totalHours / 24);
+        
+        // 更新DOM
+        document.getElementById('days').innerText = days;
+        document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
+        document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
+        document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
+        document.getElementById('total-seconds').innerText = `总共: ${totalSeconds.toLocaleString()} 秒`;
+        document.getElementById('start-date').innerText = `开始于: 2023年10月8日`;
+      }
+    
+    // 初始化计时器并每秒更新一次
+    updateTimer();
+    setInterval(updateTimer, 1000);
+    
+    // 配置后端API地址
+    // 部署后请替换为您的Cloudflare Worker URL
+    const API_URL = 'https://your-worker-url.workers.dev';
+
+    // 检查管理员登录状态
+    function checkAdminLogin() {
+      const authToken = localStorage.getItem('authToken');
+      if (authToken) {
+        // 如果已登录，显示编辑按钮
+        showEditButtons();
+      }
+    }
+
+    // 页面加载时检查登录状态
+    window.addEventListener('load', checkAdminLogin);
+
+    // 管理员功能
+    let authToken = null;
+    
+    // 显示管理员登录模块
+    function showAdminLogin() {
+      document.getElementById('admin-login').classList.remove('hidden');
+      document.getElementById('admin-login').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // 隐藏管理员登录模块
+    function hideAdminLogin() {
+      document.getElementById('admin-login').classList.add('hidden');
+    }
+    
+    // 显示编辑按钮
+    function showEditButtons() {
+      const editButtons = document.querySelectorAll('.edit-buttons');
+      editButtons.forEach(button => {
+        button.classList.remove('hidden');
+      });
+    }
+    
+    // 隐藏编辑按钮
+    function hideEditButtons() {
+      const editButtons = document.querySelectorAll('.edit-buttons');
+      editButtons.forEach(button => {
+        button.classList.add('hidden');
+      });
+    }
+    
+    // 登录表单提交处理
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      try {
+        const response = await fetch(`${API_URL}/api/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          authToken = data.token;
+          document.getElementById('login-error').classList.add('hidden');
+          document.getElementById('login-form').classList.add('hidden');
+          document.getElementById('admin-panel').classList.remove('hidden');
+          showEditButtons();
+          loadTimelineItems(); // 加载最新的时间轴数据
+          loadAlbumItems(); // 加载最新的相册数据
+        } else {
+          document.getElementById('login-error').innerText = data.message;
+          document.getElementById('login-error').classList.remove('hidden');
+        }
+      } catch (error) {
+        document.getElementById('login-error').innerText = '登录失败，请稍后重试';
+        document.getElementById('login-error').classList.remove('hidden');
+        console.error('Login error:', error);
+      }
+    });
+    
+    // 退出登录
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      authToken = null;
+      document.getElementById('login-form').classList.remove('hidden');
+      document.getElementById('admin-panel').classList.add('hidden');
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('login-error').classList.add('hidden');
+      hideEditButtons();
+    });
+    
+    // 加载时间轴数据
+    async function loadTimelineItems() {
+      try {
+        const response = await fetch(`${API_URL}/api/timeline`);
+        const items = await response.json();
+        // 这里应该更新时间轴UI
+        console.log('Timeline items loaded:', items);
+      } catch (error) {
+        console.error('Failed to load timeline items:', error);
+      }
+    }
+    
+    // 加载相册数据
+    async function loadAlbumItems() {
+      try {
+        const response = await fetch(`${API_URL}/api/albums`);
+        const items = await response.json();
+        // 这里应该更新相册UI
+        console.log('Album items loaded:', items);
+      } catch (error) {
+        console.error('Failed to load album items:', error);
+      }
+    }
+    
+    // 添加时间轴项按钮
+    document.getElementById('add-timeline-btn').addEventListener('click', async function() {
+      // 创建一个简单的表单来添加时间轴项
+      const date = prompt('请输入日期 (YYYY-MM-DD):');
+      const title = prompt('请输入标题:');
+      const description = prompt('请输入描述:');
+      const image = prompt('请输入图片URL:');
+      
+      if (date && title && description && image) {
+        try {
+          const response = await fetch(`${API_URL}/api/timeline`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ date, title, description, image })
+          });
+          
+          const data = await response.json();
+          if (response.ok) {
+            alert('时间轴项添加成功！');
+            loadTimelineItems(); // 重新加载时间轴数据
+          } else {
+            alert(`添加失败: ${data.message}`);
+          }
+        } catch (error) {
+          alert('添加失败，请稍后重试');
+          console.error('Add timeline error:', error);
+        }
+      }
+    });
+    
+    // 添加相册按钮
+    document.getElementById('add-album-btn').addEventListener('click', async function() {
+      // 创建一个简单的表单来添加相册
+      const title = prompt('请输入相册标题:');
+      const description = prompt('请输入相册描述:');
+      const coverImage = prompt('请输入封面图片URL:');
+      const photoCount = prompt('请输入照片数量:');
+      
+      if (title && description && coverImage && photoCount) {
+        try {
+          const response = await fetch(`${API_URL}/api/albums`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ title, description, coverImage, photoCount: parseInt(photoCount) })
+          });
+          
+          const data = await response.json();
+          if (response.ok) {
+            alert('相册添加成功！');
+            loadAlbumItems(); // 重新加载相册数据
+          } else {
+            alert(`添加失败: ${data.message}`);
+          }
+        } catch (error) {
+          alert('添加失败，请稍后重试');
+          console.error('Add album error:', error);
+        }
+      }
+    });
+    
+    // 编辑时间轴项
+    document.querySelectorAll('.edit-timeline-btn').forEach(button => {
+      button.addEventListener('click', async function() {
+        const id = this.getAttribute('data-id');
+        // 在实际应用中，这里应该打开一个模态框
+        const date = prompt('请输入新日期 (YYYY-MM-DD):');
+        const title = prompt('请输入新标题:');
+        const description = prompt('请输入新描述:');
+        const image = prompt('请输入新图片URL:');
+        
+        if (date || title || description || image) {
+          try {
+            const response = await fetch(`${API_URL}/api/timeline/${id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+              },
+              body: JSON.stringify({ date, title, description, image })
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+              alert('时间轴项更新成功！');
+              loadTimelineItems(); // 重新加载时间轴数据
+            } else {
+              alert(`更新失败: ${data.message}`);
+            }
+          } catch (error) {
+            alert('更新失败，请稍后重试');
+            console.error('Update timeline error:', error);
+          }
+        }
+      });
+    });
+    
+    // 删除时间轴项
+    document.querySelectorAll('.delete-timeline-btn').forEach(button => {
+      button.addEventListener('click', async function() {
+        const id = this.getAttribute('data-id');
+        if (confirm('确定要删除这个时间轴项吗？')) {
+          try {
+            const response = await fetch(`${API_URL}/api/timeline/${id}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${authToken}`
+              }
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+              alert('时间轴项已删除！');
+              loadTimelineItems(); // 重新加载时间轴数据
+            } else {
+              alert(`删除失败: ${data.message}`);
+            }
+          } catch (error) {
+            alert('删除失败，请稍后重试');
+            console.error('Delete timeline error:', error);
+          }
+        }
+      });
+    });
+    
+    // 编辑相册
+    document.querySelectorAll('.edit-album-btn').forEach(button => {
+      button.addEventListener('click', async function() {
+        const id = this.getAttribute('data-id');
+        // 在实际应用中，这里应该打开一个模态框
+        const title = prompt('请输入新相册标题:');
+        const description = prompt('请输入新相册描述:');
+        const coverImage = prompt('请输入新封面图片URL:');
+        const photoCount = prompt('请输入新照片数量:');
+        
+        if (title || description || coverImage || photoCount) {
+          try {
+            const response = await fetch(`${API_URL}/api/albums/${id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+              },
+              body: JSON.stringify({
+                title,
+                description,
+                coverImage,
+                photoCount: photoCount ? parseInt(photoCount) : undefined
+              })
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+              alert('相册更新成功！');
+              loadAlbumItems(); // 重新加载相册数据
+            } else {
+              alert(`更新失败: ${data.message}`);
+            }
+          } catch (error) {
+            alert('更新失败，请稍后重试');
+            console.error('Update album error:', error);
+          }
+        }
+      });
+    });
+    
+    // 删除相册
+    document.querySelectorAll('.delete-album-btn').forEach(button => {
+      button.addEventListener('click', async function() {
+        const id = this.getAttribute('data-id');
+        if (confirm('确定要删除这个相册吗？')) {
+          try {
+            const response = await fetch(`${API_URL}/api/albums/${id}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${authToken}`
+              }
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+              alert('相册已删除！');
+              loadAlbumItems(); // 重新加载相册数据
+            } else {
+              alert(`删除失败: ${data.message}`);
+            }
+          } catch (error) {
+            alert('删除失败，请稍后重试');
+            console.error('Delete album error:', error);
+          }
+        }
+      });
+    });
+    
+    // 页面加载时加载数据
+    window.addEventListener('load', function() {
+      loadTimelineItems();
+      loadAlbumItems();
+    });
+  </script>
+<script src="stats-counter.js"></script>
+</body>
+</html>
