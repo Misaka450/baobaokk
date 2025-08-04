@@ -94,14 +94,7 @@
                     <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-primary mb-2" id="album-title">相册详情</h2>
                     <p class="text-gray-600" id="album-description">查看相册中的所有照片</p>
                 </div>
-                <div class="flex space-x-3" id="admin-actions" class="hidden">
-                    <button id="add-photo-btn" class="bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary/90 transition-colors">
-                        <i class="fa fa-plus mr-1"></i> 添加照片
-                    </button>
-                    <button id="edit-album-btn" class="bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-colors">
-                        <i class="fa fa-edit mr-1"></i> 编辑相册
-                    </button>
-                </div>
+
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="photos-container">
@@ -194,7 +187,6 @@
                     document.getElementById('album-title').textContent = album.title;
                     document.getElementById('album-description').textContent = album.description;
                     loadAlbumPhotos(albumId);
-                    checkAdminStatus();
                 } else {
                     document.getElementById('photos-container').innerHTML = `
                         <div class="text-center col-span-full py-12 text-gray-500">
@@ -283,77 +275,9 @@
             }
         });
 
-        // 检查管理员状态
-        function checkAdminStatus() {
-            const authToken = localStorage.getItem('authToken');
-            if (authToken) {
-                document.getElementById('admin-actions').classList.remove('hidden');
-            }
-        }
 
-        // 添加照片按钮事件
-        document.getElementById('add-photo-btn').addEventListener('click', async function() {
-            const albumId = getAlbumId();
-            const url = prompt('请输入照片URL:');
-            const title = prompt('请输入照片标题:');
-            const date = prompt('请输入日期 (YYYY-MM-DD):');
 
-            if (url) {
-                try {
-                    const response = await fetch(`${API_URL}/api/albums/${albumId}/photos`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                        },
-                        body: JSON.stringify({ url, title, date })
-                    });
 
-                    const data = await response.json();
-                    if (response.ok) {
-                        alert('照片添加成功！');
-                        loadAlbumPhotos(albumId);
-                    } else {
-                        alert(`添加失败: ${data.message}`);
-                    }
-                } catch (error) {
-                    alert('添加失败，请稍后重试');
-                    console.error('Add photo error:', error);
-                }
-            }
-        });
-
-        // 编辑相册按钮事件
-        document.getElementById('edit-album-btn').addEventListener('click', async function() {
-            const albumId = getAlbumId();
-            const title = prompt('请输入新相册标题:');
-            const description = prompt('请输入新相册描述:');
-            const coverImage = prompt('请输入新封面图片URL:');
-
-            if (title || description || coverImage) {
-                try {
-                    const response = await fetch(`${API_URL}/api/albums/${albumId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                        },
-                        body: JSON.stringify({ title, description, coverImage })
-                    });
-
-                    const data = await response.json();
-                    if (response.ok) {
-                        alert('相册更新成功！');
-                        loadAlbumDetail();
-                    } else {
-                        alert(`更新失败: ${data.message}`);
-                    }
-                } catch (error) {
-                    alert('更新失败，请稍后重试');
-                    console.error('Edit album error:', error);
-                }
-            }
-        });
 
         // 页面加载时加载相册详情
         window.addEventListener('load', loadAlbumDetail);
