@@ -1,0 +1,15 @@
+name = "love-story-backend"
+type = "worker"
+account_id = "YOUR_ACCOUNT_ID" # 替换为您的Cloudflare账户ID
+workers_dev = true
+main = "worker.js"
+compatibility_date = "2023-10-08"
+
+[vars]
+# 在这里添加环境变量
+# ADMIN_USERNAME = "admin"
+# ADMIN_PASSWORD_HASH = "hashed_password"
+
+[features]
+# 启用模块语法
+"nodejs_compat" = true
