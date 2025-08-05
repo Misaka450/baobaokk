@@ -1042,15 +1042,155 @@
       // 已移除编辑按钮功能
     });
     
-    // 加载时间轴数据
+    // 加载时间轴数据并更新UI
     async function loadTimelineItems() {
       try {
         const response = await fetch(`${API_URL}/api/timeline`);
         const items = await response.json();
-        // 这里应该更新时间轴UI
+        updateTimelineUI(items);
         console.log('Timeline items loaded:', items);
       } catch (error) {
         console.error('Failed to load timeline items:', error);
+      }
+    }
+
+    // 更新时间轴UI
+    function updateTimelineUI(items) {
+      const timelineContainer = document.querySelector('#timeline .relative');
+      // 清空现有时间轴项
+      timelineContainer.innerHTML = `
+        <!-- 时间线 -->
+        <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-2 bg-primary/30 z-0"></div>
+      `;
+
+      // 按日期排序
+      items.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      // 添加时间轴项
+      items.forEach((item, index) => {
+        const isEven = index % 2 === 0;
+        const timelineItem = document.createElement('div');
+        timelineItem.className = `relative mb-12 scroll-trigger ${isEven ? 'md:pr-8 md:text-right md:ml-auto md:mr-1/2' : 'md:pl-8 md:ml-1/2'}`;
+        timelineItem.style.transitionDelay = `${index * 0.1}s`;
+        timelineItem.innerHTML = `
+          <div class="timeline-dot top-0"></div>
+          <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 memory-item">
+            <span class="text-sm text-primary font-semibold">${item.date}</span>
+            <h3 class="text-xl font-bold my-2">${item.title}</h3>
+            <p class="text-gray-600 mb-4">${item.description}</p>
+            ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}" class="rounded-lg w-full h-48 object-cover mb-4">` : ''}
+            ${authToken ? `
+            <div class="flex justify-center gap-2 mt-4">
+              <button class="edit-timeline-btn bg-secondary hover:bg-secondary/80 text-white px-4 py-2 rounded-full transition-colors" data-id="${item.id}">
+                <i class="fa fa-edit mr-1"></i> 编辑
+              </button>
+              <button class="delete-timeline-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors" data-id="${item.id}">
+                <i class="fa fa-trash mr-1"></i> 删除
+              </button>
+            </div>` : ''}
+          </div>
+        `;
+        timelineContainer.appendChild(timelineItem);
+      });
+
+      // 添加编辑和删除按钮事件监听
+      if (authToken) {
+        document.querySelectorAll('.edit-timeline-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const id = parseInt(this.getAttribute('data-id'));
+            editTimelineItem(id);
+          });
+        });
+
+        document.querySelectorAll('.delete-timeline-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const id = parseInt(this.getAttribute('data-id'));
+            deleteTimelineItem(id);
+          });
+        });
+      }
+
+      // 触发滚动动画
+      setTimeout(() => {
+        const scrollTriggers = document.querySelectorAll('.scroll-trigger');
+        scrollTriggers.forEach(trigger => {
+          trigger.classList.add('visible');
+        });
+      }, 100);
+    }
+
+    // 编辑时间轴项
+    async function editTimelineItem(id) {
+      try {
+        // 获取要编辑的项
+        const response = await fetch(`${API_URL}/api/timeline`);
+        const items = await response.json();
+        const item = items.find(item => item.id === id);
+
+        if (!item) {
+          alert('未找到该时间轴项');
+          return;
+        }
+
+        // 显示编辑表单
+        const date = prompt('编辑日期 (YYYY-MM-DD):', item.date);
+        const title = prompt('编辑标题:', item.title);
+        const description = prompt('编辑描述:', item.description);
+        const image = prompt('编辑图片URL:', item.imageUrl || '');
+
+        if (date && title && description) {
+          const updatedItem = {
+            date,
+            title,
+            description,
+            imageUrl: image
+          };
+
+          const updateResponse = await fetch(`${API_URL}/api/timeline/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(updatedItem)
+          });
+
+          const data = await updateResponse.json();
+          if (updateResponse.ok) {
+            alert('时间轴项更新成功！');
+            loadTimelineItems(); // 重新加载时间轴数据
+          } else {
+            alert(`更新失败: ${data.message}`);
+          }
+        }
+      } catch (error) {
+        alert('编辑失败，请稍后重试');
+        console.error('Edit timeline error:', error);
+      }
+    }
+
+    // 删除时间轴项
+    async function deleteTimelineItem(id) {
+      if (confirm('确定要删除这个时间轴项吗？')) {
+        try {
+          const response = await fetch(`${API_URL}/api/timeline/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+
+          const data = await response.json();
+          if (response.ok) {
+            alert('时间轴项删除成功！');
+            loadTimelineItems(); // 重新加载时间轴数据
+          } else {
+            alert(`删除失败: ${data.message}`);
+          }
+        } catch (error) {
+          alert('删除失败，请稍后重试');
+          console.error('Delete timeline error:', error);
+        }
       }
     }
     
