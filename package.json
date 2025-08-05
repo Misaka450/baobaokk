@@ -1,0 +1,11 @@
+{
+  "name": "baobaokk",
+  "version": "1.0.0",
+  "description": "Baobao and Kaikai website",
+  "scripts": {
+    "build": "echo 'No build required' && exit 0",
+    "test": "echo 'No tests specified' && exit 0"
+  },
+  "author": "",
+  "license": "ISC"
+}

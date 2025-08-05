@@ -5,6 +5,10 @@ workers_dev = true
 main = "worker.js"
 compatibility_date = "2023-10-08"
 
+# Cloudflare Pages 配置
+[pages]
+build_output_dir = "next-app"
+
 [vars]
 # 在这里添加环境变量
 # ADMIN_USERNAME = "admin"
