@@ -65,14 +65,14 @@ async function handleRequest(request) {
   // 时间轴API
   if (path === '/api/timeline' && method === 'GET') {
     return new Response(JSON.stringify(timelineItems), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' }
     });
   }
 
   // 处理根路径请求
   if (path === '/') {
     return new Response('Welcome to BabyKK Timeline API!\n\n可用接口:\n- GET /api/timeline - 获取时间轴数据', {
-      headers: { ...corsHeaders, 'Content-Type': 'text/plain' }
+      headers: { ...corsHeaders, 'Content-Type': 'text/plain; charset=utf-8' }
     });
   }
 
@@ -89,7 +89,7 @@ async function handleRequest(request) {
       example: 'GET /api/timeline 返回示例:\n' + JSON.stringify(timelineItems[0], null, 2)
     };
     return new Response(JSON.stringify(docs, null, 2), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' }
     });
   }
 }
