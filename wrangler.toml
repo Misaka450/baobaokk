@@ -9,5 +9,4 @@ compatibility_date = "2023-10-08"
 # ADMIN_USERNAME = "admin"
 # ADMIN_PASSWORD_HASH = "hashed_password"
 
-[[compatibility_flags]]
-"nodejs_compat" = true
+compatibility_flags = ["nodejs_compat"]
