@@ -1,12 +1,7 @@
 name = "love-story"
-type = "pages"
 account_id = "YOUR_ACCOUNT_ID" # 替换为您的Cloudflare账户ID
 workers_dev = true
 compatibility_date = "2023-10-08"
-
-# Cloudflare Pages 配置
-[pages]
-build_output_dir = "next-app"
 main = "next-app/simple-worker.js"
 
 [vars]
@@ -14,6 +9,5 @@ main = "next-app/simple-worker.js"
 # ADMIN_USERNAME = "admin"
 # ADMIN_PASSWORD_HASH = "hashed_password"
 
-[features]
 # 启用模块语法
-"nodejs_compat" = true
+nodejs_compat = true
