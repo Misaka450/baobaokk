@@ -69,9 +69,27 @@ async function handleRequest(request) {
     });
   }
 
-  // 处理其他路由
-  return new Response('Not Found', {
-    status: 404,
-    headers: corsHeaders
-  });
+  // 处理根路径请求
+  if (path === '/') {
+    return new Response('Welcome to BabyKK Timeline API!\n\n可用接口:\n- GET /api/timeline - 获取时间轴数据', {
+      headers: { ...corsHeaders, 'Content-Type': 'text/plain' }
+    });
+  }
+
+  // 为前端应用提供API文档说明
+  if (path === '/api/docs') {
+    const docs = {
+      endpoints: [
+        {
+          path: '/api/timeline',
+          method: 'GET',
+          description: '获取宝宝成长时间轴数据'
+        }
+      ],
+      example: 'GET /api/timeline 返回示例:\n' + JSON.stringify(timelineItems[0], null, 2)
+    };
+    return new Response(JSON.stringify(docs, null, 2), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
 }
