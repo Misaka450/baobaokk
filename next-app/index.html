@@ -57,6 +57,13 @@
         left: 50%;
         transform: translateX(-50%);
       }
+      .timeline-container {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+      .timeline-container.visible {
+        opacity: 1;
+      }
       .timeline-dot {
         height: 20px;
         width: 20px;
@@ -193,7 +200,7 @@
         <p class="text-gray-600 max-w-2xl mx-auto">记录我们在一起的每一个重要时刻，回顾我们的爱情旅程。</p>
       </div>
 
-      <div class="relative">
+      <div class="relative timeline-container" id="timelineContainer">
         <!-- 时间线 -->
         <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-2 bg-primary/30 z-0"></div>
 
@@ -201,36 +208,36 @@
         <div class="relative z-10 mb-16 flex flex-col md:flex-row items-center scroll-trigger">
           <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 mt-4 md:mt-0">
             <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
-              <div class="flex justify-between items-center mb-3">
+              <div class="flex justify-between items-center mb-3 md:justify-end">
               <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2023-01-15</span>
-
             </div>
             <h3 class="text-xl font-bold text-primary mb-2">第一次约会</h3>
             <p class="text-gray-600 mb-3">在咖啡厅的初次相遇，我们聊了整整一个下午，仿佛时间静止了。</p>
-            <div class="flex justify-end">
-              <img src="https://picsum.photos/seed/firstdate/400/300" alt="第一次约会照片" class="w-full md:w-2/3 rounded-lg">
-            </div>
             </div>
           </div>
           <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-1 timeline-dot">1</div>
-          <div class="md:w-1/2 md:pl-12 hidden md:block order-3"></div>
+          <div class="md:w-1/2 md:pl-12 order-3 mt-4 md:mt-0">
+            <div class="bg-white p-6 rounded-xl shadow-lg memory-item h-full flex items-center justify-center">
+              <img src="https://picsum.photos/seed/firstdate/400/300" alt="第一次约会照片" class="w-full h-64 object-cover rounded-lg">
+            </div>
+          </div>
         </div>
 
         <!-- 时间点2 -->
         <div class="relative z-10 mb-16 flex flex-col md:flex-row items-center scroll-trigger">
-          <div class="md:w-1/2 md:pr-12 hidden md:block order-1"></div>
+          <div class="md:w-1/2 md:pr-12 order-1 mt-4 md:mt-0">
+            <div class="bg-white p-6 rounded-xl shadow-lg memory-item h-full flex items-center justify-center">
+              <img src="https://picsum.photos/seed/relationship/400/300" alt="确定关系照片" class="w-full h-64 object-cover rounded-lg">
+            </div>
+          </div>
           <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-2 timeline-dot">2</div>
           <div class="md:w-1/2 md:pl-12 order-3 mt-4 md:mt-0">
             <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
               <div class="flex justify-between items-center mb-3">
               <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2023-03-20</span>
-
             </div>
             <h3 class="text-xl font-bold text-primary mb-2">确定关系</h3>
             <p class="text-gray-600 mb-3">在樱花树下，我向你表白，你害羞地点了点头，从此我们成为了彼此的依靠。</p>
-            <div class="flex justify-start">
-              <img src="https://picsum.photos/seed/relationship/400/300" alt="确定关系照片" class="w-full md:w-2/3 rounded-lg">
-            </div>
             </div>
           </div>
         </div>
@@ -239,36 +246,36 @@
         <div class="relative z-10 mb-16 flex flex-col md:flex-row items-center scroll-trigger">
           <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 mt-4 md:mt-0">
             <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
-              <div class="flex justify-between items-center mb-3">
+              <div class="flex justify-between items-center mb-3 md:justify-end">
               <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2023-07-01</span>
-
             </div>
             <h3 class="text-xl font-bold text-primary mb-2">第一次旅行</h3>
             <p class="text-gray-600 mb-3">我们一起去了海边，看日出日落，踩在沙滩上，感受海风的拥抱。</p>
-            <div class="flex justify-end">
-              <img src="https://picsum.photos/seed/firsttrip/400/300" alt="第一次旅行照片" class="w-full md:w-2/3 rounded-lg">
-            </div>
             </div>
           </div>
           <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-1 timeline-dot">3</div>
-          <div class="md:w-1/2 md:pl-12 hidden md:block order-3"></div>
+          <div class="md:w-1/2 md:pl-12 order-3 mt-4 md:mt-0">
+            <div class="bg-white p-6 rounded-xl shadow-lg memory-item h-full flex items-center justify-center">
+              <img src="https://picsum.photos/seed/firsttrip/400/300" alt="第一次旅行照片" class="w-full h-64 object-cover rounded-lg">
+            </div>
+          </div>
         </div>
 
         <!-- 时间点4 -->
         <div class="relative z-10 mb-16 flex flex-col md:flex-row items-center scroll-trigger">
-          <div class="md:w-1/2 md:pr-12 hidden md:block order-1"></div>
+          <div class="md:w-1/2 md:pr-12 order-1 mt-4 md:mt-0">
+            <div class="bg-white p-6 rounded-xl shadow-lg memory-item h-full flex items-center justify-center">
+              <img src="https://picsum.photos/seed/christmas/400/300" alt="第一个圣诞节照片" class="w-full h-64 object-cover rounded-lg">
+            </div>
+          </div>
           <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-2 timeline-dot">4</div>
           <div class="md:w-1/2 md:pl-12 order-3 mt-4 md:mt-0">
             <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
               <div class="flex justify-between items-center mb-3">
               <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2023-12-25</span>
-
             </div>
             <h3 class="text-xl font-bold text-primary mb-2">第一个圣诞节</h3>
             <p class="text-gray-600 mb-3">一起装饰圣诞树，交换礼物，度过了一个温馨浪漫的圣诞节。</p>
-            <div class="flex justify-start">
-              <img src="https://picsum.photos/seed/christmas/400/300" alt="第一个圣诞节照片" class="w-full md:w-2/3 rounded-lg">
-            </div>
             </div>
           </div>
         </div>
@@ -277,19 +284,19 @@
         <div class="relative z-10 flex flex-col md:flex-row items-center scroll-trigger">
           <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 mt-4 md:mt-0">
             <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
-              <div class="flex justify-between items-center mb-3">
+              <div class="flex justify-between items-center mb-3 md:justify-end">
               <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2024-05-20</span>
-
             </div>
             <h3 class="text-xl font-bold text-primary mb-2">一周年纪念日</h3>
             <p class="text-gray-600 mb-3">在我们第一次约会的餐厅庆祝一周年，重温了当初的甜蜜和感动。</p>
-            <div class="flex justify-end">
-              <img src="https://picsum.photos/seed/anniversary/400/300" alt="一周年纪念日照片" class="w-full md:w-2/3 rounded-lg">
-            </div>
             </div>
           </div>
           <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-1 timeline-dot">5</div>
-          <div class="md:w-1/2 md:pl-12 hidden md:block order-3"></div>
+          <div class="md:w-1/2 md:pl-12 order-3 mt-4 md:mt-0">
+            <div class="bg-white p-6 rounded-xl shadow-lg memory-item h-full flex items-center justify-center">
+              <img src="https://picsum.photos/seed/anniversary/400/300" alt="一周年纪念日照片" class="w-full h-64 object-cover rounded-lg">
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -968,7 +975,7 @@
     
     // 配置后端API地址
     // 部署后请替换为您的Cloudflare Worker URL
-    const API_URL = 'https://your-worker-url.workers.dev';
+    const API_URL = 'http://localhost:3000'; // 与管理员后台保持一致，修正端口号
 
     // 检查管理员登录状态
     function checkAdminLogin() {
@@ -1042,15 +1049,45 @@
       // 已移除编辑按钮功能
     });
     
+    // 检测管理员后台更新并刷新时间轴
+    window.addEventListener('storage', function(event) {
+      if (event.key === 'timelineUpdated' && event.newValue === 'true') {
+        loadTimelineItems();
+        // 重置标志
+        localStorage.setItem('timelineUpdated', 'false');
+      }
+    });
+
+    // 初始检查是否有更新
+    if (localStorage.getItem('timelineUpdated') === 'true') {
+      loadTimelineItems();
+      localStorage.setItem('timelineUpdated', 'false');
+    }
+
     // 加载时间轴数据并更新UI
     async function loadTimelineItems() {
+      const timelineContainer = document.getElementById('timelineContainer');
       try {
         const response = await fetch(`${API_URL}/api/timeline`);
-        const items = await response.json();
-        updateTimelineUI(items);
-        console.log('Timeline items loaded:', items);
+        if (response.ok) {
+          const items = await response.json();
+          // 只有当API返回有效数据时才更新UI
+          if (items && items.length > 0) {
+            updateTimelineUI(items);
+            console.log('Timeline items loaded:', items);
+          } else {
+            // API返回空数据，显示静态内容
+            timelineContainer.classList.add('visible');
+          }
+        } else {
+          console.error('Failed to load timeline items: API returned', response.status);
+          // API错误，显示静态内容
+          timelineContainer.classList.add('visible');
+        }
       } catch (error) {
         console.error('Failed to load timeline items:', error);
+        // 网络错误，显示静态内容
+        timelineContainer.classList.add('visible');
       }
     }
 
@@ -1062,6 +1099,9 @@
         <!-- 时间线 -->
         <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-2 bg-primary/30 z-0"></div>
       `;
+      
+      // 显示时间轴容器
+      timelineContainer.classList.add('visible');
 
       // 按日期排序
       items.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -1070,26 +1110,68 @@
       items.forEach((item, index) => {
         const isEven = index % 2 === 0;
         const timelineItem = document.createElement('div');
-        timelineItem.className = `relative mb-12 scroll-trigger ${isEven ? 'md:pr-8 md:text-right md:ml-auto md:mr-1/2' : 'md:pl-8 md:ml-1/2'}`;
+        timelineItem.className = `relative z-10 mb-16 flex flex-col md:flex-row items-center scroll-trigger`;
         timelineItem.style.transitionDelay = `${index * 0.1}s`;
-        timelineItem.innerHTML = `
-          <div class="timeline-dot top-0"></div>
-          <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 memory-item">
-            <span class="text-sm text-primary font-semibold">${item.date}</span>
-            <h3 class="text-xl font-bold my-2">${item.title}</h3>
-            <p class="text-gray-600 mb-4">${item.description}</p>
-            ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}" class="rounded-lg w-full h-48 object-cover mb-4">` : ''}
-            ${authToken ? `
-            <div class="flex justify-center gap-2 mt-4">
-              <button class="edit-timeline-btn bg-secondary hover:bg-secondary/80 text-white px-4 py-2 rounded-full transition-colors" data-id="${item.id}">
-                <i class="fa fa-edit mr-1"></i> 编辑
-              </button>
-              <button class="delete-timeline-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors" data-id="${item.id}">
-                <i class="fa fa-trash mr-1"></i> 删除
-              </button>
-            </div>` : ''}
-          </div>
-        `;
+        
+        // 根据奇偶性决定文字和图片的位置
+        if (!isEven) {
+          // 奇数项: 左侧文字，右侧图片
+          timelineItem.innerHTML = `
+            <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 mt-4 md:mt-0">
+              <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
+                <div class="flex justify-between items-center mb-3 md:justify-end">
+                  <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">${item.date}</span>
+                </div>
+                <h3 class="text-xl font-bold text-primary mb-2">${item.title}</h3>
+                <p class="text-gray-600 mb-3">${item.description}</p>
+                ${authToken ? `
+                <div class="flex justify-center gap-2 mt-4 md:justify-end">
+                  <button class="edit-timeline-btn bg-secondary hover:bg-secondary/80 text-white px-4 py-2 rounded-full transition-colors" data-id="${item.id}">
+                    <i class="fa fa-edit mr-1"></i> 编辑
+                  </button>
+                  <button class="delete-timeline-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors" data-id="${item.id}">
+                    <i class="fa fa-trash mr-1"></i> 删除
+                  </button>
+                </div>` : ''}
+              </div>
+            </div>
+            <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-1 timeline-dot">${index + 1}</div>
+            <div class="md:w-1/2 md:pl-12 order-3 mt-4 md:mt-0">
+              <div class="bg-white p-6 rounded-xl shadow-lg memory-item h-full flex items-center justify-center">
+                <img src="${item.imageUrl || 'https://picsum.photos/seed/default/400/300'}" alt="${item.title}" class="w-full h-64 object-cover rounded-lg">
+              </div>
+            </div>
+          `;
+        } else {
+          // 偶数项: 左侧图片，右侧文字
+          timelineItem.innerHTML = `
+            <div class="md:w-1/2 md:pr-12 order-1 mt-4 md:mt-0">
+              <div class="bg-white p-6 rounded-xl shadow-lg memory-item h-full flex items-center justify-center">
+                <img src="${item.imageUrl || 'https://picsum.photos/seed/default/400/300'}" alt="${item.title}" class="w-full h-64 object-cover rounded-lg">
+              </div>
+            </div>
+            <div class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-20 order-2 timeline-dot">${index + 1}</div>
+            <div class="md:w-1/2 md:pl-12 order-3 mt-4 md:mt-0">
+              <div class="bg-white p-6 rounded-xl shadow-lg memory-item">
+                <div class="flex justify-between items-center mb-3">
+                  <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">${item.date}</span>
+                </div>
+                <h3 class="text-xl font-bold text-primary mb-2">${item.title}</h3>
+                <p class="text-gray-600 mb-3">${item.description}</p>
+                ${authToken ? `
+                <div class="flex justify-center gap-2 mt-4">
+                  <button class="edit-timeline-btn bg-secondary hover:bg-secondary/80 text-white px-4 py-2 rounded-full transition-colors" data-id="${item.id}">
+                    <i class="fa fa-edit mr-1"></i> 编辑
+                  </button>
+                  <button class="delete-timeline-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors" data-id="${item.id}">
+                    <i class="fa fa-trash mr-1"></i> 删除
+                  </button>
+                </div>` : ''}
+              </div>
+            </div>
+          `;
+        }
+        
         timelineContainer.appendChild(timelineItem);
       });
 

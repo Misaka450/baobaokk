@@ -17,6 +17,34 @@ let timelineItems = [
     date: '2023-01-15',
     description: '我们的宝宝出生了！',
     imageUrl: 'https://picsum.photos/600/400?random=1'
+  },
+  {
+    id: 2,
+    title: '第一次微笑',
+    date: '2023-02-20',
+    description: '宝宝第一次微笑了！',
+    imageUrl: 'https://picsum.photos/600/400?random=2'
+  },
+  {
+    id: 3,
+    title: '满月纪念',
+    date: '2023-02-15',
+    description: '宝宝满月了！',
+    imageUrl: 'https://picsum.photos/600/400?random=3'
+  },
+  {
+    id: 4,
+    title: '第一次翻身',
+    date: '2023-03-10',
+    description: '宝宝第一次翻身了！',
+    imageUrl: 'https://picsum.photos/600/400?random=4'
+  },
+  {
+    id: 5,
+    title: '百日宴',
+    date: '2023-04-23',
+    description: '宝宝百日宴！',
+    imageUrl: 'https://picsum.photos/600/400?random=5'
   }
 ];
 
@@ -44,17 +72,16 @@ let photoItems = [
     albumId: 1,
     url: 'https://picsum.photos/600/400?random=4',
     description: '宝宝在洗澡'
-  }
-];
+  },
   // 相册1的照片
-  { id: 1, albumId: 1, url: 'https://picsum.photos/600/400?random=101', description: '旅行照片1' },
-  { id: 2, albumId: 1, url: 'https://picsum.photos/600/400?random=102', description: '旅行照片2' },
+  { id: 3, albumId: 1, url: 'https://picsum.photos/600/400?random=101', description: '旅行照片1' },
+  { id: 4, albumId: 1, url: 'https://picsum.photos/600/400?random=102', description: '旅行照片2' },
   // 相册2的照片
-  { id: 3, albumId: 2, url: 'https://picsum.photos/600/400?random=201', description: '美食照片1' },
-  { id: 4, albumId: 2, url: 'https://picsum.photos/600/400?random=202', description: '美食照片2' },
+  { id: 5, albumId: 2, url: 'https://picsum.photos/600/400?random=201', description: '美食照片1' },
+  { id: 6, albumId: 2, url: 'https://picsum.photos/600/400?random=202', description: '美食照片2' },
   // 相册3的照片
-  { id: 5, albumId: 3, url: 'https://picsum.photos/600/400?random=301', description: '纪念日照片1' },
-  { id: 6, albumId: 3, url: 'https://picsum.photos/600/400?random=302', description: '纪念日照片2' }
+  { id: 7, albumId: 3, url: 'https://picsum.photos/600/400?random=301', description: '纪念日照片1' },
+  { id: 8, albumId: 3, url: 'https://picsum.photos/600/400?random=302', description: '纪念日照片2' }
 ];
 
 // 管理员账户 (实际应用中应使用环境变量存储)
@@ -127,6 +154,18 @@ async function handleRequest(request) {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+  }
+
+  // 仪表盘API
+  if (path === '/api/dashboard' && method === 'GET') {
+    return new Response(JSON.stringify({
+      timelineCount: timelineItems.length,
+      albumCount: albumItems.length,
+      photoCount: photoItems.length,
+      visitCount: 0 // 模拟访问量
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 
   // 时间轴API
@@ -230,6 +269,18 @@ async function handleRequest(request) {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+  }
+
+  // 仪表盘数据API
+  if (path === '/api/dashboard' && method === 'GET') {
+    return new Response(JSON.stringify({
+      timelineCount: timelineItems.length,
+      albumCount: albumItems.length,
+      photoCount: photoItems.length,
+      visitCount: 128
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 
   // 相册API

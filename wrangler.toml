@@ -1,13 +1,13 @@
-name = "love-story-backend"
-type = "worker"
+name = "love-story"
+type = "pages"
 account_id = "YOUR_ACCOUNT_ID" # 替换为您的Cloudflare账户ID
 workers_dev = true
-main = "worker.js"
 compatibility_date = "2023-10-08"
 
 # Cloudflare Pages 配置
 [pages]
 build_output_dir = "next-app"
+main = "next-app/simple-worker.js"
 
 [vars]
 # 在这里添加环境变量

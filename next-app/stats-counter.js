@@ -2,7 +2,7 @@
 // 用于自动统计网站数据并更新UI
 
 // 配置API URL
-const STATS_API_URL = 'http://localhost:8787';
+const STATS_API_URL = 'http://localhost:3000';
 
 // 页面加载完成后执行
 document.addEventListener('DOMContentLoaded', () => {

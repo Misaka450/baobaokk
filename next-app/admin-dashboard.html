@@ -11,11 +11,11 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3B82F6',
-                        secondary: '#10B981',
-                        accent: '#8B5CF6',
-                        dark: '#1F2937',
-                        light: '#F3F4F6'
+                        primary: '#FF6B8B',
+                        secondary: '#FFB6C1',
+                        accent: '#FF9A9E',
+                        dark: '#333333',
+                        light: '#FFF5F7'
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -39,13 +39,28 @@
                 @apply bg-light;
             }
             .card-hover {
-                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-2;
+            }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all duration-300 shadow-md shadow-primary/20;
+            }
+            .btn-secondary {
+                @apply bg-white hover:bg-gray-50 text-primary border border-primary px-4 py-2 rounded-lg transition-all duration-300;
+            }
+            .input-field {
+                @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300;
+            }
+            .timeline-line {
+                @apply h-full w-1 bg-primary/30 absolute left-1/2 transform -translate-x-1/2;
+            }
+            .timeline-dot {
+                @apply h-6 w-6 bg-primary rounded-full absolute left-1/2 transform -translate-x-1/2 -translate-y-3 z-10 border-2 border-white;
             }
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans text-dark">
-    <div class="flex h-screen overflow-hidden">
+<body class="bg-light font-sans text-dark min-h-screen">
+    <div class="flex min-h-screen overflow-hidden">
         <!-- 侧边栏导航 -->
         <aside id="sidebar" class="w-64 bg-white shadow-lg z-20 transition-all duration-300 lg:translate-x-0" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
             <div class="flex flex-col h-full">
@@ -78,10 +93,10 @@
                 </div>
             </div>
             <div class="p-4 border-t flex justify-end space-x-3">
-                <button type="button" id="cancelSelectPhotosBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-300">
+                <button type="button" id="cancelSelectPhotosBtn" class="btn-secondary">
                     取消
                 </button>
-                <button type="button" id="confirmSelectPhotosBtn" class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors duration-300">
+                <button type="button" id="confirmSelectPhotosBtn" class="btn-primary">
                     确认选择
                 </button>
             </div>
@@ -126,7 +141,7 @@
 
                 <!-- 侧边栏底部 -->
                 <div class="p-4 border-t">
-                    <button id="logoutBtn" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center">
+                    <button id="logoutBtn" class="w-full bg-primary hover:bg-primary/90 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center shadow-md shadow-primary/20">
                         <i class="fa fa-sign-out mr-2"></i>退出登录
                     </button>
                 </div>
@@ -280,7 +295,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="username" class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
-                                    <input type="text" id="username" name="username" value="admin" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300">
+                                    <input type="text" id="username" name="username" value="admin" class="input-field">
                                 </div>
                                 <div>
                                     <label for="email" class="block text-sm font-medium text-gray-700 mb-1">电子邮箱</label>
@@ -440,22 +455,22 @@
                 <input type="hidden" id="photowallId">
                 <div>
                     <label for="photowallTitle" class="block text-sm font-medium text-gray-700 mb-1">标题</label>
-                    <input type="text" id="photowallTitle" name="photowallTitle" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300" required>
+                    <input type="text" id="photowallTitle" name="photowallTitle" class="input-field" required>
                 </div>
                 <div>
                     <label for="photowallDescription" class="block text-sm font-medium text-gray-700 mb-1">描述</label>
-                    <textarea id="photowallDescription" name="photowallDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300"></textarea>
+                    <textarea id="photowallDescription" name="photowallDescription" rows="3" class="input-field"></textarea>
                 </div>
                 <div>
                     <label for="photowallAlbums" class="block text-sm font-medium text-gray-700 mb-1">关联相册</label>
-                    <select id="photowallAlbums" name="photowallAlbums" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300" multiple required>
+                    <select id="photowallAlbums" name="photowallAlbums" class="input-field" multiple required>
                         <!-- 相册选项将通过JavaScript动态加载 -->
                     </select>
                     <p class="text-xs text-gray-500 mt-1">按住Ctrl键可选择多个相册</p>
                 </div>
                 <div>
                 <label for="photowallLayout" class="block text-sm font-medium text-gray-700 mb-1">布局类型</label>
-                <select id="photowallLayout" name="photowallLayout" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-300" required>
+                <select id="photowallLayout" name="photowallLayout" class="input-field" required>
                     <option value="grid">网格布局</option>
                     <option value="masonry">瀑布流布局</option>
                     <option value="carousel">轮播布局</option>
@@ -489,7 +504,7 @@
 
     <script>
         // 配置
-        const API_URL = 'http://localhost:8787'; // 本地开发环境
+        const API_URL = 'http://localhost:3000'; // 本地开发环境，与test-server.js保持一致
         const HOME_URL = 'index.html';
         const LOGIN_URL = 'admin-login.html';
 
@@ -557,21 +572,16 @@
         // 加载仪表盘数据
         async function loadDashboardData() {
             try {
-                // 本地开发环境模拟数据
-                if (API_URL.includes('localhost')) {
-                    timelineCountEl.textContent = '3';
-                    albumCountEl.textContent = '3';
-                    photoCountEl.textContent = '54';
-                    visitCountEl.textContent = '128';
-                } else {
-                    // 生产环境获取真实数据
-                    const response = await fetch(`${API_URL}/api/dashboard`);
-                    const data = await response.json();
-                    timelineCountEl.textContent = data.timelineCount || '0';
-                    albumCountEl.textContent = data.albumCount || '0';
-                    photoCountEl.textContent = data.photoCount || '0';
-                    visitCountEl.textContent = data.visitCount || '0';
+                // 无论环境如何，都从API获取数据
+                const response = await fetch(`${API_URL}/api/dashboard`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                const data = await response.json();
+                timelineCountEl.textContent = data.timelineCount || '0';
+                albumCountEl.textContent = data.albumCount || '0';
+                photoCountEl.textContent = data.photoCount || '0';
+                visitCountEl.textContent = data.visitCount || '0';
             } catch (error) {
                 console.error('加载仪表盘数据错误:', error);
                 // 显示错误通知
@@ -581,19 +591,12 @@
         // 加载时间轴数据
         async function loadTimelineData() {
             try {
-                // 本地开发环境模拟数据
-                let timelineItems;
-                if (API_URL.includes('localhost')) {
-                    timelineItems = [
-                        { id: 1, date: '2023-10-08', title: '我们的第一天', description: '第一次相遇的日子', image: 'https://picsum.photos/600/400?random=1' },
-                        { id: 2, date: '2023-10-15', title: '第一次约会', description: '一起看电影和吃饭', image: 'https://picsum.photos/600/400?random=2' },
-                        { id: 3, date: '2023-11-08', title: '确定关系', description: '正式成为情侣', image: 'https://picsum.photos/600/400?random=3' }
-                    ];
-                } else {
-                    // 生产环境获取真实数据
-                    const response = await fetch(`${API_URL}/api/timeline`);
-                    timelineItems = await response.json();
+                // 无论环境如何，都从API获取数据
+                const response = await fetch(`${API_URL}/api/timeline`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                const timelineItems = await response.json();
 
                 // 更新表格
                 timelineTableBody.innerHTML = '';
@@ -605,7 +608,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.title}</td>
                         <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">${item.description}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <img src="${item.image}" alt="${item.title}" class="h-12 w-12 rounded object-cover">
+                            <img src="${item.imageUrl}" alt="${item.title}" class="h-12 w-12 rounded object-cover">
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <button class="text-indigo-600 hover:text-indigo-900 mr-3 edit-timeline" data-id="${item.id}">
@@ -677,14 +680,14 @@
             const date = row.cells[1].textContent;
             const title = row.cells[2].textContent;
             const description = row.cells[3].textContent;
-            const image = row.cells[4].querySelector('img').src;
-            
+            const imageUrl = row.cells[4].querySelector('img').src;
+
             // 填充表单
             document.getElementById('timelineId').value = id;
             document.getElementById('timelineDate').value = date;
             document.getElementById('timelineTitle').value = title;
             document.getElementById('timelineDescription').value = description;
-            document.getElementById('timelineImage').value = image;
+            document.getElementById('timelineImage').value = imageUrl;
             
             // 显示模态框
             timelineModal.classList.remove('hidden');
@@ -711,6 +714,9 @@
                     
                     // 重新加载数据
                     await loadTimelineData();
+
+                    // 设置localStorage标志通知首页更新
+                    localStorage.setItem('timelineUpdated', 'true');
                 } catch (error) {
                     console.error('删除时间轴项目错误:', error);
                     alert('删除时间轴项目失败，请稍后重试');
@@ -1435,48 +1441,37 @@
                         }
                     }
 
-                    const timelineData = { date, title, description, image: imageUrl };
+                    const timelineData = { date, title, description, imageUrl: imageUrl };
 
-                    // 本地开发环境模拟
-                    if (API_URL.includes('localhost')) {
-                        // 模拟API调用延迟
-                        await new Promise(resolve => setTimeout(resolve, 500));
-
-                        if (id) {
-                            // 模拟更新
-                            console.log('更新时间轴项目:', id, timelineData);
-                        } else {
-                            // 模拟添加
-                            console.log('添加时间轴项目:', timelineData);
-                        }
+                    // 无论是本地开发环境还是生产环境，都实际发送API请求
+                    if (id) {
+                        // 更新项目
+                        await fetch(`${API_URL}/api/timeline/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('authToken') || 'dev-token'}`
+                            },
+                            body: JSON.stringify(timelineData)
+                        });
                     } else {
-                        // 生产环境API调用
-                        if (id) {
-                            // 更新项目
-                            await fetch(`${API_URL}/api/timeline/${id}`, {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                                },
-                                body: JSON.stringify(timelineData)
-                            });
-                        } else {
-                            // 添加新项目
-                            await fetch(`${API_URL}/api/timeline`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                                },
-                                body: JSON.stringify(timelineData)
-                            });
-                        }
+                        // 添加新项目
+                        await fetch(`${API_URL}/api/timeline`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('authToken') || 'dev-token'}`
+                            },
+                            body: JSON.stringify(timelineData)
+                        });
                     }
 
                     // 重新加载数据
                     await loadTimelineData();
-                     
+
+                    // 设置localStorage标志通知首页更新
+                    localStorage.setItem('timelineUpdated', 'true');
+                      
                     // 关闭模态框
                     timelineModal.classList.add('hidden');
                 } catch (error) {
