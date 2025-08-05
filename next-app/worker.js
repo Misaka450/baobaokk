@@ -1,22 +1,75 @@
 // Cloudflare Worker 后端代码
 // 用于处理API请求和数据存储
 
+// Cloudflare R2 配置
+const R2_BUCKET_NAME = 'baobaokk-photos'; // 替换为你的R2存储桶名称
+
+/**
+ * 获取R2存储桶实例
+ * @returns {R2Bucket|null} R2存储桶实例，如果在非Cloudflare环境中则返回null
+ */
+
 // 模拟数据存储
 let timelineItems = [
-  { id: 1, date: '2023-10-08', title: '我们的第一天', description: '第一次相遇的日子', image: 'https://picsum.photos/600/400?random=1' },
-  { id: 2, date: '2023-10-15', title: '第一次约会', description: '一起看电影和吃饭', image: 'https://picsum.photos/600/400?random=2' },
-  { id: 3, date: '2023-11-08', title: '确定关系', description: '正式成为情侣', image: 'https://picsum.photos/600/400?random=3' }
+  {
+    id: 1,
+    title: '宝宝出生',
+    date: '2023-01-15',
+    description: '我们的宝宝出生了！',
+    imageUrl: 'https://picsum.photos/600/400?random=1'
+  }
 ];
 
 let albumItems = [
-  { id: 1, title: '旅行回忆', description: '我们一起去过的地方', coverImage: 'https://picsum.photos/600/400?random=4', photoCount: 24 },
-  { id: 2, title: '美食日记', description: '一起品尝的美食', coverImage: 'https://picsum.photos/600/400?random=5', photoCount: 18 },
-  { id: 3, title: '纪念日', description: '特殊的日子', coverImage: 'https://picsum.photos/600/400?random=6', photoCount: 12 }
+  {
+    id: 1,
+    title: '满月照',
+    description: '宝宝满月纪念',
+    coverUrl: 'https://picsum.photos/600/400?random=2',
+    photoCount: 5,
+    createdAt: '2023-02-15'
+  }
+];
+
+// 存储照片数据
+let photoItems = [
+  {
+    id: 1,
+    albumId: 1,
+    url: 'https://picsum.photos/600/400?random=3',
+    description: '宝宝在睡觉'
+  },
+  {
+    id: 2,
+    albumId: 1,
+    url: 'https://picsum.photos/600/400?random=4',
+    description: '宝宝在洗澡'
+  }
+];
+  // 相册1的照片
+  { id: 1, albumId: 1, url: 'https://picsum.photos/600/400?random=101', description: '旅行照片1' },
+  { id: 2, albumId: 1, url: 'https://picsum.photos/600/400?random=102', description: '旅行照片2' },
+  // 相册2的照片
+  { id: 3, albumId: 2, url: 'https://picsum.photos/600/400?random=201', description: '美食照片1' },
+  { id: 4, albumId: 2, url: 'https://picsum.photos/600/400?random=202', description: '美食照片2' },
+  // 相册3的照片
+  { id: 5, albumId: 3, url: 'https://picsum.photos/600/400?random=301', description: '纪念日照片1' },
+  { id: 6, albumId: 3, url: 'https://picsum.photos/600/400?random=302', description: '纪念日照片2' }
 ];
 
 // 管理员账户 (实际应用中应使用环境变量存储)
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'password123'; // 实际应用中应使用加密存储
+
+// 获取R2存储桶
+function getR2Bucket() {
+  // 在Cloudflare Worker环境中
+  if (typeof env !== 'undefined' && env[R2_BUCKET_NAME]) {
+    return env[R2_BUCKET_NAME];
+  }
+  // 本地开发环境返回null
+  return null;
+}
 
 // 处理请求的主函数
 addEventListener('fetch', event => {
@@ -280,6 +333,129 @@ async function handleRequest(request) {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+  }
+
+  // 文件上传API
+  if (path === '/api/upload' && method === 'POST') {
+    const isAuthenticated = await authenticate();
+    if (!isAuthenticated) {
+      return new Response(JSON.stringify({
+        success: false,
+        message: '未授权访问'
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    try {
+      // 解析表单数据
+      const formData = await request.formData();
+      const file = formData.get('file');
+      const albumId = formData.get('albumId');
+      const description = formData.get('description') || '';
+
+      if (!file || !albumId) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: '缺少文件或相册ID'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      // 检查文件类型
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: '不支持的文件类型，仅支持JPG、PNG和WEBP'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      // 检查文件大小（最大2MB）
+      if (file.size > 2 * 1024 * 1024) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: '文件大小超过2MB限制'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      // 生成唯一文件名
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 10);
+      const fileExtension = file.name.split('.').pop() || 'jpg';
+      const fileName = `${timestamp}-${randomString}.${fileExtension}`;
+
+      let fileUrl;
+      const r2Bucket = getR2Bucket();
+
+      if (r2Bucket) {
+        // 上传到Cloudflare R2
+        await r2Bucket.put(fileName, file.stream(), {
+          httpMetadata: { contentType: file.type },
+          customMetadata: { albumId, description }
+        });
+
+        // 生成文件URL (假设已配置自定义域)
+        // 实际应用中，应根据你的R2配置生成正确的URL
+        fileUrl = `https://${R2_BUCKET_NAME}.r2.cloudflarestorage.com/${fileName}`;
+      } else {
+        // 本地开发环境，使用picsum.photos模拟
+        const randomId = Math.floor(Math.random() * 1000);
+        fileUrl = `https://picsum.photos/600/400?random=${randomId}`;
+      }
+
+      // 保存照片信息
+      const newPhotoId = photoItems.length + 1;
+      const newPhoto = {
+        id: newPhotoId,
+        albumId: parseInt(albumId),
+        url: fileUrl,
+        description
+      };
+      photoItems.push(newPhoto);
+
+      // 更新相册照片数量
+      const albumIndex = albumItems.findIndex(album => album.id === parseInt(albumId));
+      if (albumIndex !== -1) {
+        albumItems[albumIndex].photoCount += 1;
+      }
+
+      return new Response(JSON.stringify({
+        success: true,
+        url: fileUrl,
+        photo: newPhoto
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      console.error('文件上传错误:', error);
+      return new Response(JSON.stringify({
+        success: false,
+        message: '文件上传失败'
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // 获取相册照片API
+  if (path.startsWith('/api/albums/') && path.endsWith('/photos') && method === 'GET') {
+    const albumId = parseInt(path.split('/')[3]);
+    const albumPhotos = photoItems.filter(photo => photo.albumId === albumId);
+
+    return new Response(JSON.stringify(albumPhotos), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 
   // 处理其他路由

@@ -1134,6 +1134,12 @@
     
 
     
+    // 为查看全部回忆按钮添加点击事件
+    document.getElementById('view-all-btn').addEventListener('click', function() {
+      // 跳转到相册部分
+      document.getElementById('album').scrollIntoView({ behavior: 'smooth' });
+    });
+
     // 页面加载时加载数据
     window.addEventListener('load', function() {
       loadTimelineItems();
